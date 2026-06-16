@@ -1,0 +1,56 @@
+version: '3.9'
+
+volumes:
+  shlyukhogram-db-volume:
+    name: shlyukhogram-db-volume
+
+x-logging: &formatted-logging
+  driver: json-file
+  options:
+    tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+    max-size: '10m'
+    max-file: '3'
+    mode: 'non-blocking'
+    max-buffer-size: '4m'
+
+services:
+  shlyukhogram-server:
+    container_name: shlyukhogram-server
+    image: shlyukhogram-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    tty: true
+    restart: always
+    ports:
+      - ${PORT:-18777}:8000
+    environment:
+      DATABASE_USER: { DATABASE_USER }
+      DATABASE_PASSWORD: { DATABASE_PASSWORD }
+      DATABASE_NAME: { DATABASE_NAME }
+      DATABASE_HOST: { DATABASE_HOST }
+      DATABASE_PORT: { DATABASE_PORT }
+      WORKERS: { SERVER_WORKERS }
+      SUPERUSER_EMAIL: { SUPERUSER_EMAIL }
+      SUPERUSER_PASS: { SUPERUSER_PASS }
+    logging: *formatted-logging
+    networks:
+      - shlyukhogram-network
+
+  db:
+    container_name: shlyukhogram_db
+    image: postgres:15.0-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready --username=${DATABASE_USER} --dbname=${DATABASE_NAME}
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - shlyukhogram-db-volume:/var/lib/postgresql/data
+    logging: *formatted-logging
+    networks:
+      - shlyukhogram-network
