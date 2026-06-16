@@ -1,8 +1,10 @@
-version: '3.9'
-
 volumes:
   shlyukhogram-db-volume:
     name: shlyukhogram-db-volume
+
+networks:
+  shlyukhogram-network:
+    name: shlyukhogram-network
 
 x-logging: &formatted-logging
   driver: json-file
@@ -22,27 +24,32 @@ services:
       dockerfile: Dockerfile
     tty: true
     restart: always
+    depends_on:
+      - shlyukhogram-db
     ports:
       - ${PORT:-18777}:8000
-    environment:
-      DATABASE_USER: { DATABASE_USER }
-      DATABASE_PASSWORD: { DATABASE_PASSWORD }
-      DATABASE_NAME: { DATABASE_NAME }
-      DATABASE_HOST: { DATABASE_HOST }
-      DATABASE_PORT: { DATABASE_PORT }
-      WORKERS: { SERVER_WORKERS }
-      SUPERUSER_EMAIL: { SUPERUSER_EMAIL }
-      SUPERUSER_PASS: { SUPERUSER_PASS }
+    env_file:
+      - .env
+    # environment:
+    #   DATABASE_USER: { DATABASE_USER }
+    #   DATABASE_PASSWORD: { DATABASE_PASSWORD }
+    #   DATABASE_NAME: { DATABASE_NAME }
+    #   DATABASE_HOST: { DATABASE_HOST }
+    #   DATABASE_PORT: { DATABASE_PORT }
+    #   WORKERS: { SERVER_WORKERS }
+    #   SUPERUSER_EMAIL: { SUPERUSER_EMAIL }
+    #   SUPERUSER_PASS: { SUPERUSER_PASS }
     logging: *formatted-logging
     networks:
       - shlyukhogram-network
 
-  db:
+  shlyukhogram-db:
     container_name: shlyukhogram_db
     image: postgres:15.0-alpine
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     restart: unless-stopped
     healthcheck:
       test: pg_isready --username=${DATABASE_USER} --dbname=${DATABASE_NAME}

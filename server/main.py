@@ -1,25 +1,54 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from pydantic import BaseModel
+
+from services.users import models
+from database import get_db
+
+
+# Pydantic validation structures
+class UserBase(BaseModel):
+    username: str
+    email: str
+
+class UserCreate(UserBase):
+    pass
+
+class UserResponse(UserBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        from_attributes = True
 
 app = FastAPI()
 
-# Define a Pydantic model to validate incoming data
-class User(BaseModel):
-    username: str
-    email: str
-    is_active: bool = True
+# Async GET endpoint
+@app.get("/users/{user_id}", response_model=UserResponse)
+async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
+    # Create an async selection statement
+    stmt = select(models.UserModel).where(models.UserModel.id == user_id)
+    result = await db.execute(stmt)
+    db_user = result.scalars().first()
 
-# A simple GET endpoint
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to my FastAPI application!"}
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
 
-# A GET endpoint with path parameters
-@app.get("/users/{user_id}")
-def get_user(user_id: int, status: str | None = None):
-    return {"user_id": user_id, "status": status}
+# Async POST endpoint
+@app.post("/users/", response_model=UserResponse)
+async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    # Check for duplicate username asynchronously
+    stmt = select(models.UserModel).where(models.UserModel.username == user.username)
+    result = await db.execute(stmt)
+    if result.scalars().first():
+        raise HTTPException(status_code=400, detail="Username already registered")
 
-# A POST endpoint to receive and validate data
-@app.post("/users/")
-def create_user(user: User):
-    return {"message": "User created successfully", "data": user}
+    new_user = models.UserModel(username=user.username, email=user.email)
+    db.add(new_user)
+
+    # Commit changes and refresh instance mapping asynchronously
+    await db.commit()
+    await db.refresh(new_user)
+    return new_user

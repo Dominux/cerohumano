@@ -21,6 +21,10 @@ COPY --from=builder /runtime /usr/local
 WORKDIR /
 COPY ./main.py ./
 COPY ./run.sh ./
+COPY ./database.py ./
+COPY ./alembic.ini ./
+COPY ./migrations ./migrations
+COPY ./services ./services
 RUN chmod +x run.sh
 
 CMD ["sh", "./run.sh"]
