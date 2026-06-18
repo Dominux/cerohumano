@@ -19,12 +19,11 @@ FROM base AS runtime
 COPY --from=builder /runtime /usr/local
 
 WORKDIR /
+COPY ./alembic.ini ./
 COPY ./main.py ./
 COPY ./run.sh ./
-COPY ./database.py ./
-COPY ./alembic.ini ./
 COPY ./migrations ./migrations
-COPY ./services ./services
+COPY ./app ./app
 RUN chmod +x run.sh
 
 CMD ["sh", "./run.sh"]

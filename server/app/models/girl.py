@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base
+
+from app.common.database import Base
 
 
-class UserModel(Base):
-    __tablename__ = "users"
+class GirlModel(Base):
+    __tablename__ = "girls"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)

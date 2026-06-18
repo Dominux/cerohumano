@@ -3,11 +3,10 @@ from logging.config import fileConfig
 
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
 
-from database import Base, ASYNC_SQLALCHEMY_DATABASE_URL
-from services.users import models as users_models
+from app.common import database
+from app.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -22,7 +21,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = database.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -33,7 +32,7 @@ target_metadata = Base.metadata
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     context.configure(
-        url=ASYNC_SQLALCHEMY_DATABASE_URL,
+        url=database.ASYNC_SQLALCHEMY_DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -51,7 +50,7 @@ def do_run_migrations(connection):
 async def run_migrations_online() -> None:
     """Run migrations in 'online' mode using an AsyncEngine."""
     configuration = config.get_section(config.config_ini_section) or {}
-    configuration["sqlalchemy.url"] = ASYNC_SQLALCHEMY_DATABASE_URL
+    configuration["sqlalchemy.url"] = database.ASYNC_SQLALCHEMY_DATABASE_URL
 
     connectable = async_engine_from_config(
         configuration,
