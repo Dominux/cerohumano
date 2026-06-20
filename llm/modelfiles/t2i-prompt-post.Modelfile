@@ -1,0 +1,7 @@
+# Use the Qwen 3.5 base model
+FROM /app/models/qwen3.5.gguf
+
+# Adjust parameters for high creativity while keeping output structured
+PARAMETER temperature 0.85
+PARAMETER top_p 0.95
+PARAMETER num_ctx 4096

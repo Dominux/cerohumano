@@ -2,3 +2,6 @@
 /server/__pycache__
 /server/migrations/__pycache__
 /.env
+
+/llm/models/*
+!/llm/models/.gitkeep
