@@ -28,7 +28,7 @@ app = FastAPI()
 @app.get("/users/{user_id}", response_model=UserResponse)
 async def read_user(user_id: int, db: AsyncSession = Depends(database.get_db)):
     # Create an async selection statement
-    stmt = select(models.GirlModel).where(models.GirlModel.id == user_id)
+    stmt = select(models.CeroHumanoModel).where(models.CeroHumanoModel.id == user_id)
     result = await db.execute(stmt)
     db_user = result.scalars().first()
 
@@ -40,12 +40,12 @@ async def read_user(user_id: int, db: AsyncSession = Depends(database.get_db)):
 @app.post("/users/", response_model=UserResponse)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(database.get_db)):
     # Check for duplicate username asynchronously
-    stmt = select(models.GirlModel).where(models.GirlModel.username == user.username)
+    stmt = select(models.CeroHumanoModel).where(models.CeroHumanoModel.username == user.username)
     result = await db.execute(stmt)
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="Username already registered")
 
-    new_user = models.GirlModel(username=user.username, email=user.email)
+    new_user = models.CeroHumanoModel(username=user.username, email=user.email)
     db.add(new_user)
 
     # Commit changes and refresh instance mapping asynchronously

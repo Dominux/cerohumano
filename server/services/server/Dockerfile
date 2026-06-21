@@ -11,17 +11,17 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_DEFAULT_TIMEOUT=100
 
 WORKDIR /src
-COPY requirements.txt ./
+COPY ./requirements.txt ./
 RUN pip install --prefix=/runtime --force-reinstall -r requirements.txt
 
 # Runtime stage
 FROM base AS runtime
 COPY --from=builder /runtime /usr/local
 
-WORKDIR /
+WORKDIR /src
 COPY ./alembic.ini ./
-COPY ./main.py ./
-COPY ./run.sh ./
+COPY ./services/server/main.py ./
+COPY ./services/server/run.sh ./
 COPY ./migrations ./migrations
 COPY ./app ./app
 RUN chmod +x run.sh

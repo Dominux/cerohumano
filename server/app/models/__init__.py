@@ -1,1 +1,1 @@
-from .girl import GirlModel
+from .cerohumano import CeroHumanoModel
