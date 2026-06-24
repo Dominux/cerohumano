@@ -1,7 +1,7 @@
 import os
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Note the change to 'postgresql+asyncpg'
 DB_HOST = os.environ['DATABASE_HOST']
@@ -26,7 +26,8 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False  # Prevents attributes from expiring after commit
 )
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    ...
 
 # Async dependency to safely provision and yield database sessions per request
 async def get_db():
