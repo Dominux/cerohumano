@@ -20,9 +20,7 @@ COPY --from=builder /runtime /usr/local
 
 WORKDIR /src
 COPY ./alembic.ini ./
-COPY ./services/generator/run.sh ./
-COPY ./services/generator/main.py ./
-COPY ./services/generator/llm_service.py ./
+COPY ./services/generator/* ./
 COPY ./app ./app
 RUN chmod +x run.sh
 

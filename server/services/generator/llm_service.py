@@ -36,7 +36,7 @@ class LLMService:
     def __init__(self, trigger_word: str) -> None:
         self.trigger_word = trigger_word
 
-    async def generate_post(self) -> 'tuple[str, list[str]]':
+    async def generate_post(self, images_amount=4) -> 'tuple[str, list[str]]':
         async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
             # 1. getting caption
             first_msg = (
@@ -74,7 +74,7 @@ class LLMService:
                         "role": "user",
                         "content": (
                             "Perfect. Now, based EXACTLY on the vibe, outfit, "
-                            "and setting implied in that caption, generate exactly 4 distinct, "
+                            f"and setting implied in that caption, generate exactly {images_amount} distinct, "
                             "highly appealing, and striking image generation prompts (one per line) "
                             "for a single continuous photo session.\n\nFollow these rules perfectly:\n"
                             "1. Describe the scene directly from a cinematic camera perspective.\n"
@@ -91,7 +91,13 @@ class LLMService:
                 ]
             )
 
-            prompts = await self._request_llm(client, payload)
+            prompts_text = await self._request_llm(client, payload)
+            prompts = []
+            for line in reversed(prompts_text.splitlines()):
+                if BASE_TRIGGER_WORD in line:
+                    prompts.append(line)
+                    if len(prompts) == images_amount:
+                        break
 
             return caption, prompts
 
