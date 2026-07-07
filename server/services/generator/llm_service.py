@@ -53,6 +53,7 @@ class LLMService:
                 "model": "t2i-prompt-post",
                 "stream": False,
                 "think": False,
+                "keep_alive": 0, # to unload the model after the request
                 "messages": [
                     {
                         "role": "user",
@@ -95,7 +96,9 @@ class LLMService:
             prompts = []
             for line in reversed(prompts_text.splitlines()):
                 if BASE_TRIGGER_WORD in line:
-                    prompts.append(line)
+                    prompt = line.replace(BASE_TRIGGER_WORD, self.trigger_word)
+                    prompts.append(prompt)
+
                     if len(prompts) == images_amount:
                         break
 

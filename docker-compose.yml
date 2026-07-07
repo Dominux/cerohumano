@@ -53,9 +53,9 @@ services:
     restart: always
     ports:
       - 8000:8000
-    # depends_on:
-    # - cerohumano-db
-    # - cerohumano-llm
+    depends_on:
+      # - cerohumano-db
+      - cerohumano-llm
     env_file:
       - .env
     logging: *formatted-logging
@@ -83,25 +83,25 @@ services:
   #   networks:
   #     - cerohumano-network
 
-  # cerohumano-llm:
-  #   container_name: cerohumano_llm
-  #   image: cerohumano-llm
-  #   build:
-  #     context: ./llm
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 11434:11434
-  #   volumes:
-  #     - ./llm/models:/app/models
-  #   tty: true
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: all
-  #             capabilities: [gpu]
-  #   logging: *formatted-logging
-  #   networks:
-  #     - cerohumano-network
+  cerohumano-llm:
+    container_name: cerohumano_llm
+    image: cerohumano-llm
+    build:
+      context: ./llm
+      dockerfile: Dockerfile
+    ports:
+      - 11434:11434
+    volumes:
+      - ./llm/models:/app/models
+    tty: true
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    logging: *formatted-logging
+    networks:
+      - cerohumano-network

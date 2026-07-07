@@ -12,8 +12,10 @@ class UserBase(BaseModel):
     username: str
     email: str
 
+
 class UserCreate(UserBase):
     pass
+
 
 class UserResponse(UserBase):
     id: int
@@ -22,7 +24,9 @@ class UserResponse(UserBase):
     class Config:
         from_attributes = True
 
+
 app = FastAPI()
+
 
 # Async GET endpoint
 @app.get("/users/{user_id}", response_model=UserResponse)
@@ -35,6 +39,7 @@ async def read_user(user_id: int, db: AsyncSession = Depends(database.get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
 
 # Async POST endpoint
 @app.post("/users/", response_model=UserResponse)
