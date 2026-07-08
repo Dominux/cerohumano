@@ -9,6 +9,9 @@ class CeroHumanoModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
+    first_name: Mapped[str] = mapped_column(nullable=False)
+    last_name: Mapped[str] = mapped_column(nullable=False)
+
     trigger_word: Mapped[str] = mapped_column(nullable=False, unique=True)
     lora_name: Mapped[str] = mapped_column(nullable=False, unique=True)
     cup_enlarge_max: Mapped[float] = mapped_column(

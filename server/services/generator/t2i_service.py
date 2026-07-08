@@ -43,8 +43,8 @@ class T2IService:
 
             await self._request_comfy(client, wf)
 
-    @staticmethod
-    async def _request_comfy(client, workflow):
+    @classmethod
+    async def _request_comfy(cls, client, workflow):
         payload = {"prompt": workflow, "client_id": "cerohumano_app"}
 
         try:
@@ -94,16 +94,46 @@ class T2IService:
 
         outputs = job_data.get("outputs", {})
         # 1. Safely extract metadata from Node 66
-        if "66" in outputs and "images" in outputs["66"]:
-            image_list = outputs["66"]["images"]
+        if not ("66" in outputs and "images" in outputs["66"]):
+            return
 
-            if image_list:
-                first_image = image_list[0]
+        image_list = outputs["66"]["images"]
 
-                # 2. Grab the specific strings
-                filename = first_image.get("filename")
-                subfolder = first_image.get("subfolder", "")
-                # image_type = first_image.get("type", "output")
+        if not image_list:
+            return
 
-                print(f"📁 Filename: {filename}")
-                print(f"📂 Subfolder: {subfolder}")
+        first_image = image_list[0]
+
+        # 2. Grab the specific strings
+        filename = first_image.get("filename")
+        subfolder = first_image.get("subfolder", "")
+
+        local_target = f"./downloads/{filename}"
+        os.makedirs("./downloads", exist_ok=True)
+
+        print(f"📁 Filename: {filename}")
+        print(f"📂 Subfolder: {subfolder}")
+
+        await cls.download_comfy_image(filename, subfolder, local_target)
+
+    @staticmethod
+    async def download_comfy_image(filename: str, subfolder: str, output_path: str = "output.png"):
+        # 1. Construct the precise query parameters required by ComfyUI
+        params = {
+            "filename": filename,
+            "subfolder": subfolder,
+            "type": "output"
+        }
+
+        # 2. Use a dedicated client with an open read timeout for large streams
+        async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, read=None)) as client:
+            print(f"📥 Downloading {filename} from host server...")
+
+            response = await client.get(f"{T2I_BASEURL}/view", params=params)
+            response.raise_for_status()  # Throws exception if file doesn't exist
+
+            # 3. Stream the raw binary bytes safely into a local file
+            with open(output_path, "wb") as f:
+                f.write(response.content)
+
+            print(f"🎉 Success! Image saved locally to: {os.path.abspath(output_path)}")

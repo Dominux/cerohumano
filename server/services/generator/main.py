@@ -23,10 +23,7 @@ async def t2i_gen():
 
 
 @app.get('/gen_post')
-async def gen_post():
-    trigger_word = 'cerohumano'
-    lora_name = f'{trigger_word}_03_000002000.safetensors'
-
+async def gen_post(trigger_word: str, lora_name: str):
     llm_service = LLMService(trigger_word)
     caption, prompts = await llm_service.generate_post()
 

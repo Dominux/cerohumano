@@ -1,6 +1,8 @@
 volumes:
   cerohumano-db-volume:
     name: cerohumano-db-volume
+  cerohumano-llm-volume:
+    name: cerohumano-db-volume
 
 networks:
   cerohumano-network:
@@ -93,6 +95,7 @@ services:
       - 11434:11434
     volumes:
       - ./llm/models:/app/models
+      - cerohumano-llm-volume:/root/.ollama
     tty: true
     restart: unless-stopped
     deploy:
@@ -102,6 +105,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    logging: *formatted-logging
+    # logging: *formatted-logging
     networks:
       - cerohumano-network
