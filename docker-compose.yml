@@ -1,8 +1,10 @@
 volumes:
+  cerohumano-fs-volume:
+    name: cerohumano-fs-volume
   cerohumano-db-volume:
     name: cerohumano-db-volume
   cerohumano-llm-volume:
-    name: cerohumano-db-volume
+    name: cerohumano-llm-volume
 
 networks:
   cerohumano-network:
@@ -18,93 +20,86 @@ x-logging: &formatted-logging
     max-buffer-size: '4m'
 
 services:
-  # cerohumano-server:
-  #   container_name: cerohumano_server
-  #   image: cerohumano-server
-  #   build:
-  #     context: ./server
-  #     dockerfile: ./services/server/Dockerfile
-  #   tty: true
-  #   restart: always
-  #   depends_on:
-  #     - cerohumano-db
-  #   ports:
-  #     - ${PORT:-18777}:8000
-  #   env_file:
-  #     - .env
-  #   # environment:
-  #   #   DATABASE_USER: { DATABASE_USER }
-  #   #   DATABASE_PASSWORD: { DATABASE_PASSWORD }
-  #   #   DATABASE_NAME: { DATABASE_NAME }
-  #   #   DATABASE_HOST: { DATABASE_HOST }
-  #   #   DATABASE_PORT: { DATABASE_PORT }
-  #   #   WORKERS: { SERVER_WORKERS }
-  #   #   SUPERUSER_EMAIL: { SUPERUSER_EMAIL }
-  #   #   SUPERUSER_PASS: { SUPERUSER_PASS }
-  #   logging: *formatted-logging
-  #   networks:
-  #     - cerohumano-network
-
-  cerohumano-generator:
-    container_name: cerohumano_generator
-    image: cerohumano-generator
+  cerohumano-server:
+    container_name: cerohumano_server
+    image: cerohumano-server
     build:
       context: ./server
-      dockerfile: ./services/generator/Dockerfile
+      dockerfile: ./services/server/Dockerfile
     tty: true
     restart: always
-    ports:
-      - 8000:8000
     depends_on:
-      # - cerohumano-db
-      - cerohumano-llm
+      - cerohumano-db
+    ports:
+      - ${PORT:-18777}:8000
     env_file:
       - .env
     logging: *formatted-logging
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    volumes:
+      - cerohumano-fs-volume:/data
     networks:
       - cerohumano-network
 
-  # cerohumano-db:
-  #   container_name: cerohumano_db
-  #   image: postgres:15.0-alpine
-  #   environment:
-  #     POSTGRES_USER: ${DATABASE_USER}
-  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-  #     POSTGRES_DB: ${DATABASE_NAME}
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: pg_isready --username=${DATABASE_USER} --dbname=${DATABASE_NAME}
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 10
-  #   volumes:
-  #     - cerohumano-db-volume:/var/lib/postgresql/data
+  # cerohumano-generator:
+  #   container_name: cerohumano_generator
+  #   image: cerohumano-generator
+  #   build:
+  #     context: ./server
+  #     dockerfile: ./services/generator/Dockerfile
+  #   tty: true
+  #   restart: always
+  #   ports:
+  #     - 8000:8000
+  #   depends_on:
+  #     # - cerohumano-db
+  #     - cerohumano-llm
+  #   env_file:
+  #     - .env
   #   logging: *formatted-logging
+  #   extra_hosts:
+  #     - 'host.docker.internal:host-gateway'
   #   networks:
   #     - cerohumano-network
 
-  cerohumano-llm:
-    container_name: cerohumano_llm
-    image: cerohumano-llm
-    build:
-      context: ./llm
-      dockerfile: Dockerfile
-    ports:
-      - 11434:11434
-    volumes:
-      - ./llm/models:/app/models
-      - cerohumano-llm-volume:/root/.ollama
-    tty: true
+  cerohumano-db:
+    container_name: cerohumano_db
+    image: postgres:15.0-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    # logging: *formatted-logging
+    healthcheck:
+      test: pg_isready --username=${DATABASE_USER} --dbname=${DATABASE_NAME}
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - cerohumano-db-volume:/var/lib/postgresql/data
+    logging: *formatted-logging
     networks:
       - cerohumano-network
+
+  # cerohumano-llm:
+  #   container_name: cerohumano_llm
+  #   image: cerohumano-llm
+  #   build:
+  #     context: ./llm
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 11434:11434
+  #   volumes:
+  #     - ./llm/models:/app/models
+  #     - cerohumano-llm-volume:/root/.ollama
+  #   tty: true
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+  #   # logging: *formatted-logging
+  #   networks:
+  #     - cerohumano-network

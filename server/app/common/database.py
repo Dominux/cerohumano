@@ -1,7 +1,10 @@
+import datetime
 import os
+import uuid
 
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column, Mapped
 
 # Note the change to 'postgresql+asyncpg'
 DB_HOST = os.environ['DATABASE_HOST']
@@ -26,8 +29,22 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False  # Prevents attributes from expiring after commit
 )
 
+
 class Base(DeclarativeBase):
-    ...
+    __abstract__ = True
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        sa.UUID(as_uuid=True),
+        primary_key=True,
+        server_default=sa.text("gen_random_uuid()"),  # Generates UUID v4 in PostgreSQL
+        default=uuid.uuid4                        # Python-side fallback generation
+    )
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        server_default=sa.func.now(),
+        nullable=False
+    )
+
 
 # Async dependency to safely provision and yield database sessions per request
 async def get_db():

@@ -5,9 +5,8 @@ from app.common.database import Base
 
 
 class CeroHumanoModel(Base):
-    __tablename__ = "cerohumano"
+    __tablename__ = "cerohumanos"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
     first_name: Mapped[str] = mapped_column(nullable=False)
     last_name: Mapped[str] = mapped_column(nullable=False)
