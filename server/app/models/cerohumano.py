@@ -1,7 +1,10 @@
+import uuid
+
 import sqlalchemy as sa
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.common.database import Base
+from app.models.attachment import AttachmentModel
 
 
 class CeroHumanoModel(Base):
@@ -18,4 +21,15 @@ class CeroHumanoModel(Base):
         nullable=False,
         default=0.3,
     )
-    # pfp
+
+    profile_picture_id: Mapped[uuid.UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("attachments.id", ondelete="SET NULL"),
+        nullable=True
+    )
+
+    profile_picture: Mapped["AttachmentModel | None"] = relationship(
+        "AttachmentModel",
+        foreign_keys=[profile_picture_id],
+        back_populates="profile_users"
+    )

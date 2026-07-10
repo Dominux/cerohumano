@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.common.database import Base
-from .post import PostModel
+from app.models.post import PostModel
 
 
 # 1. Define attachment types
@@ -16,8 +16,6 @@ class AttachmentType(str, enum.Enum):
 
 class AttachmentModel(Base):
     __tablename__ = "attachments"
-
-    filename: Mapped[str] = mapped_column(sa.String(255), nullable=False)
 
     # Explicitly stores what kind of asset this is (image, video, etc.)
     file_type: Mapped[AttachmentType] = mapped_column(

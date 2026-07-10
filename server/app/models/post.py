@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.common.database import Base
-from .cerohumano import CeroHumanoModel
+from app.models.cerohumano import CeroHumanoModel
 
 
 class PostModel(Base):
