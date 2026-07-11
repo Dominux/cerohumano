@@ -12,6 +12,12 @@ class JobPriority(enum.IntEnum):
     HIGH = 1
 
 
+class JobStatus(str, enum.Enum):
+    PENDING = "pending"       # Waiting in the queue
+    PROCESSING = "processing" # Actively executing right now
+    DONE = "done"         # Errored out but keeping for history/retries
+
+
 class JobModel(Base):
     __tablename__ = "jobs"
 
@@ -20,4 +26,11 @@ class JobModel(Base):
         default=JobPriority.STANDARD,
         nullable=False,
         index=True  # Keeps sorting queries fast when ordering your queue
+    )
+
+    status: Mapped[JobStatus] = mapped_column(
+        sa.Enum(JobStatus),
+        default=JobStatus.PENDING,
+        nullable=False,
+        index=True
     )

@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import datetime
 import os
 import uuid
@@ -57,3 +58,5 @@ async def get_db():
             raise
         finally:
             await session.close()
+
+get_db_context = asynccontextmanager(get_db)
