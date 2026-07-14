@@ -6,6 +6,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.common.database import Base
 from app.models.post import PostModel
+from app.models.cerohumano import CeroHumanoModel
 
 
 # 1. Define attachment types
@@ -26,6 +27,17 @@ class AttachmentModel(Base):
     # Optional metadata (e.g., duration for videos, dimensions for all)
     # Stored as a JSON object to support flexible, asset-specific attributes
     meta_data: Mapped[dict | None] = mapped_column(sa.JSON, nullable=True)
+
+    author_id: Mapped[uuid.UUID] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("cerohumanos.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    # 2. Relationship object to access the user data directly via post.author
+    author: Mapped["CeroHumanoModel"] = relationship(
+        back_populates="posts"
+    )
 
     # Optional Link to Post (nullable=True allows use in other scenarios)
     post_id: Mapped[uuid.UUID | None] = mapped_column(

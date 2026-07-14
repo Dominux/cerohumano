@@ -27,7 +27,7 @@ class T2IService:
         self.trigger_word = trigger_word
         self.lora_name = lora_name
 
-    async def generate(self, prompt: str):
+    async def generate(self, prompt: str) -> bytes:
         async with httpx.AsyncClient(timeout=T2I_TIMEOUT) as client:
             wf = copy.deepcopy(WORKFLOW)
 
@@ -41,10 +41,10 @@ class T2IService:
             # seed
             wf["57:86"]["inputs"]["seed"] = random.randint(0, 18446744073709551615)
 
-            await self._request_comfy(client, wf)
+            return await self._request_comfy(client, wf)
 
     @classmethod
-    async def _request_comfy(cls, client, workflow):
+    async def _request_comfy(cls, client, workflow) -> bytes:
         payload = {"prompt": workflow, "client_id": "cerohumano_app"}
 
         try:
@@ -108,16 +108,10 @@ class T2IService:
         filename = first_image.get("filename")
         subfolder = first_image.get("subfolder", "")
 
-        local_target = f"./downloads/{filename}"
-        os.makedirs("./downloads", exist_ok=True)
-
-        print(f"📁 Filename: {filename}")
-        print(f"📂 Subfolder: {subfolder}")
-
-        await cls.download_comfy_image(filename, subfolder, local_target)
+        return await cls.download_comfy_image(filename, subfolder)
 
     @staticmethod
-    async def download_comfy_image(filename: str, subfolder: str, output_path: str = "output.png"):
+    async def download_comfy_image(filename: str, subfolder: str):
         # 1. Construct the precise query parameters required by ComfyUI
         params = {
             "filename": filename,
@@ -132,8 +126,4 @@ class T2IService:
             response = await client.get(f"{T2I_BASEURL}/view", params=params)
             response.raise_for_status()  # Throws exception if file doesn't exist
 
-            # 3. Stream the raw binary bytes safely into a local file
-            with open(output_path, "wb") as f:
-                f.write(response.content)
-
-            print(f"🎉 Success! Image saved locally to: {os.path.abspath(output_path)}")
+            return response.content

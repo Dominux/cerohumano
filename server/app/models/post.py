@@ -11,7 +11,6 @@ class PostModel(Base):
     __tablename__ = "posts"
 
     title: Mapped[str] = mapped_column(sa.String(255), nullable=False)
-    content: Mapped[str] = mapped_column(sa.Text, nullable=False)
 
     author_id: Mapped[uuid.UUID] = mapped_column(
         sa.UUID(as_uuid=True),

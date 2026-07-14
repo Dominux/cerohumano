@@ -30,7 +30,7 @@ class JobRepository(BaseRepository[JobModel]):
         # 4. Refresh objects so that database-generated defaults (like UUID ids, created_at timestamps)
         # are populated and readable on the returned Python objects.
         for obj in db_objects:
-            await self.session.refresh(obj)
+            await self.session.refresh(obj, attribute_names=["cerohumano"])
 
         return db_objects
 

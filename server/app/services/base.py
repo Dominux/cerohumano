@@ -30,7 +30,6 @@ class BaseService(Generic[ModelType]):
 
     async def create(self, payload: dict[str, Any]) -> ModelType:
         """Business validation wrapper to insert a new domain record."""
-        # Clean data payload parsing or default business field logic belongs here
         return await self.repository.create(payload)
 
     async def update(self, id_: uuid.UUID, update_data: dict[str, Any]) -> ModelType | None:
