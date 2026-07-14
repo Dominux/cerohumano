@@ -1,7 +1,7 @@
 {
   "66": {
     "inputs": {
-      "filename_prefix": "zit-cerohumano/cerohumano",
+      "filename_prefix": "z-image-turbo/z-image",
       "images": ["57:8", 0]
     },
     "class_type": "SaveImage",
@@ -21,8 +21,8 @@
   },
   "57:13": {
     "inputs": {
-      "width": 1200,
-      "height": 1600,
+      "width": 1152,
+      "height": 1440,
       "batch_size": 1
     },
     "class_type": "EmptySD3LatentImage",
@@ -62,7 +62,7 @@
   "57:87": {
     "inputs": {
       "shift": 7,
-      "model": ["57:94", 0]
+      "model": ["57:93", 0]
     },
     "class_type": "ModelSamplingAuraFlow",
     "_meta": {
@@ -91,7 +91,7 @@
   },
   "57:86": {
     "inputs": {
-      "seed": 246010871878363,
+      "seed": 962019836886508,
       "steps": 12,
       "cfg": 1,
       "sampler_name": "dpmpp_sde",
@@ -120,20 +120,9 @@
   },
   "57:93": {
     "inputs": {
-      "lora_name": "Z-Breast-Slider.safetensors",
+      "lora_name": "breast_size_v2_loraholic.safetensors",
       "strength_model": 0,
       "model": ["57:69", 0]
-    },
-    "class_type": "LoraLoaderModelOnly",
-    "_meta": {
-      "title": "Load LoRA"
-    }
-  },
-  "57:94": {
-    "inputs": {
-      "lora_name": "lora.TA_trained.safetensors",
-      "strength_model": 0,
-      "model": ["57:93", 0]
     },
     "class_type": "LoraLoaderModelOnly",
     "_meta": {

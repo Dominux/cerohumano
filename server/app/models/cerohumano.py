@@ -4,7 +4,6 @@ import sqlalchemy as sa
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.common.database import Base
-from app.models.attachment import AttachmentModel
 
 
 class CeroHumanoModel(Base):
@@ -24,7 +23,7 @@ class CeroHumanoModel(Base):
 
     profile_picture_id: Mapped[uuid.UUID | None] = mapped_column(
         sa.UUID(as_uuid=True),
-        sa.ForeignKey("attachments.id", ondelete="SET NULL"),
+        sa.ForeignKey("attachments.id", ondelete="SET NULL", use_alter=True),
         nullable=True
     )
 

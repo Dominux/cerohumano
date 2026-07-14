@@ -42,7 +42,7 @@ class JobModel(Base):
     )
 
     priority: Mapped[JobPriority] = mapped_column(
-        sa.Enum(JobPriority, values_callable=lambda x: [item.value for item in x]),
+        sa.Enum(JobPriority),
         default=JobPriority.STANDARD,
         nullable=False,
         index=True  # Keeps sorting queries fast when ordering your queue

@@ -17,11 +17,9 @@ logger = logging.getLogger("worker")
 class QueueManager:
     def __init__(
         self,
-        api_url: str,
-        daily_posts_amo unt: int = 15,
+        daily_posts_amount: int = 5,
         polling_interval: float = 5.0,
     ):
-        self.api_url = api_url
         self.daily_posts_amount = daily_posts_amount
         self.polling_interval = polling_interval
         self._is_running = False
