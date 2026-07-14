@@ -2,16 +2,35 @@ import asyncio
 import datetime
 import logging
 import random
+import sys
 
 from app.repositories import JobRepository, CeroHumanoRepository, PostRepository
 from app.models import JobStatus, JobType, JobModel, AttachmentType
 from app.services import AttachmentService
 from app.common.database import get_db_context
-from .t2i_service import T2IService
-from .llm_service import LLMService
+from t2i_service import T2IService
+from llm_service import LLMService
 
 
 logger = logging.getLogger("worker")
+logger.setLevel(logging.INFO)
+
+# 2. Prevent logs from duplicating if they bubble up to the root handler
+logger.propagate = False
+
+# 3. Create a StreamHandler targeting standard system output (sys.stdout)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.INFO)
+
+# 4. Define a clean, scannable format (Timestamp, Log Level, Message)
+log_formatter = logging.Formatter(
+    fmt="%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) -> %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+stdout_handler.setFormatter(log_formatter)
+
+# 5. Bind the handler to your daemon logger
+logger.addHandler(stdout_handler)
 
 
 class QueueManager:
@@ -53,6 +72,9 @@ class QueueManager:
 
                 # creating daily batch
                 cerohumanos_ids = await CeroHumanoRepository(session).list_ids()
+                if not cerohumanos_ids:
+                    logger.info('Cero cerohumanos, skipping job creation')
+                    return
 
                 daily_batch = [
                     {

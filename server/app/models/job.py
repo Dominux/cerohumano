@@ -63,5 +63,6 @@ class JobModel(Base):
 
     # 2. Relationship object to access the user data
     cerohumano: Mapped["CeroHumanoModel"] = relationship(
-        back_populates="jobs"
+        "CeroHumanoModel",
+        foreign_keys=[cerohumano_id],
     )

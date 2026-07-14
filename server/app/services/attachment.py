@@ -15,7 +15,7 @@ class AttachmentService(BaseService[AttachmentModel]):
     @staticmethod
     def _get_filepath(attach: AttachmentModel):
         filepath = BASE_PATH / str(attach.id)
-        suffix = 'webp' if attach.file_type == AttachmentType.IMAGE else 'webm'
+        suffix = 'png' if attach.file_type == AttachmentType.IMAGE else 'mp4'
         return filepath.with_suffix(suffix)
 
     async def create(self, payload: dict[str, Any], content: bytes) -> AttachmentModel:

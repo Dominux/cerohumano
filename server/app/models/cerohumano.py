@@ -30,5 +30,4 @@ class CeroHumanoModel(Base):
     profile_picture: Mapped["AttachmentModel | None"] = relationship(
         "AttachmentModel",
         foreign_keys=[profile_picture_id],
-        back_populates="profile_users"
     )

@@ -36,7 +36,8 @@ class AttachmentModel(Base):
 
     # 2. Relationship object to access the user data directly via post.author
     author: Mapped["CeroHumanoModel"] = relationship(
-        back_populates="posts"
+        "CeroHumanoModel",
+        foreign_keys=[author_id],
     )
 
     # Optional Link to Post (nullable=True allows use in other scenarios)
@@ -45,4 +46,7 @@ class AttachmentModel(Base):
         sa.ForeignKey("posts.id", ondelete="SET NULL"),
         nullable=True
     )
-    post: Mapped["PostModel | None"] = relationship(back_populates="attachments")
+    post: Mapped["PostModel | None"] = relationship(
+        "PostModel",
+        foreign_keys=[post_id],
+    )

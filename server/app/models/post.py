@@ -20,5 +20,6 @@ class PostModel(Base):
 
     # 2. Relationship object to access the user data directly via post.author
     author: Mapped["CeroHumanoModel"] = relationship(
-        back_populates="posts"
+        "CeroHumanoModel",
+        foreign_keys=[author_id],
     )
