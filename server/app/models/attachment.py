@@ -21,7 +21,8 @@ class AttachmentModel(Base):
     # Explicitly stores what kind of asset this is (image, video, etc.)
     file_type: Mapped[AttachmentType] = mapped_column(
         sa.Enum(AttachmentType),
-        nullable=False
+        nullable=False,
+        default=AttachmentType.IMAGE,
     )
 
     # Optional metadata (e.g., duration for videos, dimensions for all)

@@ -15,11 +15,11 @@ class CeroHumanoModel(Base):
 
     trigger_word: Mapped[str] = mapped_column(nullable=False, unique=True)
     lora_name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    cup_enlarge_max: Mapped[int] = mapped_column(
-        sa.CheckConstraint("cup_enlarge_max >= 0 AND cup_enlarge_max <= 10"),
-        nullable=False,
-        default=0,
-    )
+    # cup_enlarge_max: Mapped[int] = mapped_column(
+    #     sa.CheckConstraint("cup_enlarge_max >= 0 AND cup_enlarge_max <= 10"),
+    #     nullable=False,
+    #     default=0,
+    # )
 
     profile_picture_id: Mapped[uuid.UUID | None] = mapped_column(
         sa.UUID(as_uuid=True),

@@ -72,8 +72,8 @@ class QueueManager:
 
                 # creating daily batch
                 cerohumanos_ids = await CeroHumanoRepository(session).list_ids()
-                if not cerohumanos_ids:
-                    logger.info('Cero cerohumanos, skipping job creation')
+                if len(cerohumanos_ids) < 5:
+                    logger.info('Too less cerohumanos, skipping job creation')
                     return
 
                 daily_batch = [
@@ -121,6 +121,7 @@ class QueueManager:
 
         t2i_service = T2IService(job.cerohumano.trigger_word, job.cerohumano.lora_name)
         images = [await t2i_service.generate(prompt) for prompt in prompts]
+        await t2i_service.unload_model()
         return caption, images
 
     def stop(self):

@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: f01808c39a03
-Revises: 
+Revises:
 Create Date: 2026-07-14 17:11:34.011418
 
 """
@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('last_name', sa.String(), nullable=False),
     sa.Column('trigger_word', sa.String(), nullable=False),
     sa.Column('lora_name', sa.String(), nullable=False),
-    sa.Column('cup_enlarge_max', sa.Integer(), nullable=False),
+    # sa.Column('cup_enlarge_max', sa.Integer(), nullable=False),
     sa.Column('profile_picture_id', sa.UUID(), nullable=True),
     sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),

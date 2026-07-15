@@ -14,9 +14,17 @@ class AttachmentService(BaseService[AttachmentModel]):
 
     @staticmethod
     def _get_filepath(attach: AttachmentModel):
-        filepath = BASE_PATH / str(attach.id)
-        suffix = 'png' if attach.file_type == AttachmentType.IMAGE else 'mp4'
-        return filepath.with_suffix(suffix)
+        if attach.file_type == AttachmentType.IMAGE:
+            dir = 'images'
+            suffix = '.png'
+        elif attach.file_type == AttachmentType.VIDEO:
+            dir = 'videos'
+            suffix = '.mp4'
+
+        full_dir = BASE_PATH / dir
+        full_dir.mkdir(parents=True, exist_ok=True)
+
+        return full_dir / Path(str(attach.id)).with_suffix(suffix)
 
     async def create(self, payload: dict[str, Any], content: bytes) -> AttachmentModel:
         attach = await super().create(payload)

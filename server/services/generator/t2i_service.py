@@ -127,3 +127,22 @@ class T2IService:
             response.raise_for_status()  # Throws exception if file doesn't exist
 
             return response.content
+
+    @staticmethod
+    async def unload_model():
+        async with httpx.AsyncClient(timeout=T2I_TIMEOUT) as client:
+            payload = {
+                "unload_models": True,
+                "free_memory": True
+            }
+
+            try:
+                response = await client.post(f"{T2I_BASEURL}/free", json=payload)
+                response.raise_for_status()
+            except httpx.HTTPStatusError as e:
+                print(f"Server error {e.response.status_code}: {e.response.text}")
+            except httpx.RequestError as e:
+                print(f"Network error occurred: {e}")
+            else:
+                if response.status_code == 200:
+                    print("Models successfully unloaded and cache cleared.")
