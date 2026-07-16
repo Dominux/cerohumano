@@ -52,7 +52,7 @@ class QueueManager:
             try:
                 await self.run_single_cycle()
             except Exception as e:
-                logger.error(f"Unexpected error in background cycle loop: {e}")
+                logger.error(f"Unexpected error in background cycle loop", exc_info=True)
 
             # Use short non-blocking sleep before pulling the next queue item
             await asyncio.sleep(self.polling_interval)
@@ -85,7 +85,11 @@ class QueueManager:
                 jobs = await repo.create_batch(daily_batch)
                 job = jobs[0]
 
-            job = await repo.update(job, update_data={'status': JobStatus.PROCESSING})
+            job = await repo.update(
+                job,
+                update_data={'status': JobStatus.PROCESSING},
+                refresh_attrs=('cerohumano',),
+            )
 
         if job.job_type == JobType.POST:
             caption, images = await self._generate_post(job)
@@ -110,6 +114,12 @@ class QueueManager:
                     },
                     content=img,
                 )
+
+            await repo.update(
+                job,
+                update_data={'status': JobStatus.DONE},
+                refresh_attrs=('cerohumano',),
+            )
 
     async def _generate_post(self, job: 'JobModel'):
         images_amount = random.randint(3, 7)

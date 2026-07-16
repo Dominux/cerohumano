@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Generic, Type, TypeVar, Sequence
+from typing import Any, Generic, Iterable, Type, TypeVar, Sequence
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,14 +54,19 @@ class BaseRepository(Generic[ModelType]):
         await self.session.refresh(db_obj)
         return db_obj
 
-    async def update(self, db_obj: ModelType, update_data: dict[str, Any]) -> ModelType:
+    async def update(
+        self,
+        db_obj: ModelType,
+        update_data: dict[str, Any],
+        refresh_attrs: Iterable[str] | None = None
+    ) -> ModelType:
         """Update fields on an existing model record dynamically."""
         for field, value in update_data.items():
             if hasattr(db_obj, field):
                 setattr(db_obj, field, value)
 
         await self.session.commit()
-        await self.session.refresh(db_obj)
+        await self.session.refresh(db_obj, attribute_names=refresh_attrs)
         return db_obj
 
     async def delete(self, id_: uuid.UUID) -> bool:

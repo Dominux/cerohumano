@@ -1,7 +1,7 @@
 {
   "66": {
     "inputs": {
-      "filename_prefix": "zit-cerohumano/z-image",
+      "filename_prefix": "zit-cerohumano/cerohumano-",
       "images": ["57:8", 0]
     },
     "class_type": "SaveImage",
@@ -92,8 +92,8 @@
   "57:86": {
     "inputs": {
       "seed": 962019836886508,
-      "steps": 12,
-      "cfg": 1,
+      "steps": 10,
+      "cfg": 1.5,
       "sampler_name": "dpmpp_sde",
       "scheduler": "beta",
       "denoise": 1,
