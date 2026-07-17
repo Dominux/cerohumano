@@ -45,6 +45,6 @@ async def upload_profile_picture(
     attach = await AttachmentService(db).create(payload, content=content)
 
     # 4. Assigning as a profile picture
-    await CeroHumanoRepository(db).update(cerohumano, {'profile_picture': attach})
+    await CeroHumanoRepository(db).update(cerohumano.id, {'profile_picture': attach})
 
     return AttachmentResponse.model_validate(attach)

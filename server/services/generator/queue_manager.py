@@ -86,7 +86,7 @@ class QueueManager:
                 job = jobs[0]
 
             job = await repo.update(
-                job,
+                job.id,
                 update_data={'status': JobStatus.PROCESSING},
                 refresh_attrs=('cerohumano',),
             )
@@ -115,21 +115,20 @@ class QueueManager:
                     content=img,
                 )
 
-            await repo.update(
-                job,
-                update_data={'status': JobStatus.DONE},
-                refresh_attrs=('cerohumano',),
-            )
+            await repo.update(job.id, update_data={'status': JobStatus.DONE})
 
     async def _generate_post(self, job: 'JobModel'):
-        images_amount = random.randint(3, 7)
+        images_amount = random.randint(3, 4)
+
+        t2i_service = T2IService(job.cerohumano.trigger_word, job.cerohumano.lora_name)
+        # for case if it were already loaded
+        await t2i_service.unload_model()
 
         llm_service = LLMService(job.cerohumano.trigger_word)
         caption, prompts = await llm_service.generate_post(images_amount)
 
         print('\n\n', caption, prompts)
 
-        t2i_service = T2IService(job.cerohumano.trigger_word, job.cerohumano.lora_name)
         images = [await t2i_service.generate(prompt) for prompt in prompts]
         await t2i_service.unload_model()
         return caption, images

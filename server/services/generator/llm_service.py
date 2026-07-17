@@ -4,6 +4,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 import httpx
 
+from generation_setting_picker import pick_random_caption_settings
+
 
 LLM_HOST = os.environ['LLM_HOST']
 LLM_PORT = os.environ['LLM_PORT']
@@ -11,6 +13,7 @@ LLM_URL = f'http://{LLM_HOST}:{LLM_PORT}/api/chat'
 BASE_TRIGGER_WORD = 'cerohumano'
 # Set a safe, long timeout for the entire request lifecycle
 LLM_TIMEOUT = httpx.Timeout(300.0, connect=10.0)
+
 
 class ChatMessage(BaseModel):
     role: str
@@ -37,16 +40,17 @@ class LLMService:
         self.trigger_word = trigger_word
 
     async def generate_post(self, images_amount=4) -> 'tuple[str, list[str]]':
+        caption_settings = pick_random_caption_settings()
+
         async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
             # 1. getting caption
             first_msg = (
-                "Act as a close female friend posting a hot, "
-                "sexy photo from a recent fun night out or a private moment. "
-                "Write a single-line, flirtatious, casual caption in your own voice "
-                "describing the vibe, outfit, or location. "
-                "Keep it realistic, authentic, and appealing without sounding like "
-                "a commercial influencer. Do not include any links or marketing text. "
-                "Output only the caption line."
+                f"Act as a close female friend posting an erotic, hot, sexy photo. "
+                f"Write a single-line, flirtatious, casual caption in your own voice. "
+                f"Use these visual tokens strictly as the scene setting, backdrop, and context for the caption: {caption_settings}. "
+                f"Keep it realistic, authentic, and appealing without sounding like "
+                f"a commercial influencer. Do not include any links, tags, or marketing text. "
+                f"Output only the caption line."
             )
 
             payload = {
@@ -84,7 +88,13 @@ class LLMService:
                             "and actions naturally from the camera's point of view.\n"
                             "4. Do NOT use generic words like \"girl\", \"woman\", \"model\", or \"lady\". "
                             "Do not describe her baseline natural features (hair color, eye color, body type).\n"
-                            "5. Focus heavily on her alluring styling, the textures of her clothing (matching the caption), "
+                            "5. For each prompt line, independently choose one Shot Type, one Perspective, and one Pose from these pools:\n"
+                            "   - Shot Types: [close up, portrait, bust shot, medium shot, full body]\n"
+                            "   - Perspectives: [selfie, not selfie]\n"
+                            "   - Poses: [standing, sitting, lying]\n"
+                            "6. Make decisions on your own to mix and match them creatively."
+                            "Ensure every single prompt line uses a unique configuration so they are completely distinct from one another.\n"
+                            "7. Focus heavily on her alluring styling, the textures of her clothing (matching the caption), "
                             "realistic lighting, professional camera angles, and hot, natural poses to make the shots "
                             "look incredibly attractive and real. Do not include numbers or bullet points."
                         ),
@@ -122,7 +132,7 @@ class LLMService:
             print(f"Network error occurred: {e}")
 
         else:
-            print("Success:", response_data)
+            print("Successful LLM response")
             # Parse directly into the Pydantic model
             ollama_response = OllamaChatResponse.model_validate(response_data)
             return ollama_response.message.content

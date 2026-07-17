@@ -34,10 +34,7 @@ class BaseService(Generic[ModelType]):
 
     async def update(self, id_: uuid.UUID, update_data: dict[str, Any]) -> ModelType | None:
         """Locates a specific object record and performs structural field mutations."""
-        db_obj = await self.repository.get_by_id(id_)
-        if not db_obj:
-            return None
-        return await self.repository.update(db_obj, update_data)
+        return await self.repository.update(id_, update_data)
 
     async def delete(self, id_: uuid.UUID) -> bool:
         """Completely eliminates an object domain record from database state storage."""

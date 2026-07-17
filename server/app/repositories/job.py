@@ -56,8 +56,18 @@ class JobRepository(BaseRepository[JobModel]):
     async def fetch_next_job(self) -> 'JobModel | None':
         stmt = (
             sa.select(JobModel)
-            .where(JobModel.status == JobStatus.PENDING)
-            .order_by(JobModel.priority.desc(), JobModel.created_at.asc())
+            .where(
+                JobModel.status.in_(
+                    (
+                        JobStatus.PROCESSING,
+                        JobStatus.PENDING,
+                    )
+                )
+            )
+            .order_by(
+                JobModel.priority.desc(),
+                JobModel.created_at.asc(),
+            )
             .limit(1)
         )
 

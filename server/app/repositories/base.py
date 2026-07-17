@@ -56,15 +56,20 @@ class BaseRepository(Generic[ModelType]):
 
     async def update(
         self,
-        db_obj: ModelType,
+        obj_id: uuid.UUID,
         update_data: dict[str, Any],
         refresh_attrs: Iterable[str] | None = None
     ) -> ModelType:
-        """Update fields on an existing model record dynamically."""
-        for field, value in update_data.items():
-            if hasattr(db_obj, field):
-                setattr(db_obj, field, value)
+        # 1. Fetch it fresh inside this session
+        db_obj = await self.session.get(self.model, obj_id)
+        if not db_obj:
+            raise ValueError("Object not found")
 
+        # 2. Apply updates
+        for key, value in update_data.items():
+            setattr(db_obj, key, value)
+
+        # 3. Commit and Refresh will now work perfectly
         await self.session.commit()
         await self.session.refresh(db_obj, attribute_names=refresh_attrs)
         return db_obj
