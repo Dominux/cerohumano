@@ -4,8 +4,8 @@ import os
 import uuid
 
 import sqlalchemy as sa
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column, Mapped
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
 # Note the change to 'postgresql+asyncpg'
 DB_HOST = os.environ['DATABASE_HOST']
@@ -20,15 +20,29 @@ engine = create_async_engine(
     ASYNC_SQLALCHEMY_DATABASE_URL,
     echo=False,  # Set to True to see SQL queries printed to the console
     pool_size=10,
-    max_overflow=20
+    max_overflow=20,
+    pool_recycle=1800,     # Automatically close and recreate connections older than 30 mins
+    pool_pre_ping=True,    # 👈 Checks if connection is alive before using it
 )
 
 # Create a session factory specifically for AsyncSessions
-AsyncSessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     bind=engine,
-    class_=AsyncSession,
     expire_on_commit=False  # Prevents attributes from expiring after commit
 )
+
+
+# Async dependency to safely provision and yield database sessions per request
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+get_db_context = asynccontextmanager(get_db)
 
 
 class Base(DeclarativeBase):
@@ -45,18 +59,3 @@ class Base(DeclarativeBase):
         server_default=sa.func.now(),
         nullable=False
     )
-
-
-# Async dependency to safely provision and yield database sessions per request
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
-get_db_context = asynccontextmanager(get_db)
