@@ -31,7 +31,7 @@ services:
     depends_on:
       - cerohumano-db
     ports:
-      - ${PORT:-18777}:8000
+      - ${SERVER_PORT:-18777}:8000
     env_file:
       - .env
     logging: *formatted-logging
@@ -48,11 +48,10 @@ services:
       dockerfile: ./services/generator/Dockerfile
     tty: true
     restart: always
-    ports:
-      - 8000:8000
     depends_on:
-      # - cerohumano-db
+      - cerohumano-db
       - cerohumano-llm
+      - cerohumano-server
     env_file:
       - .env
     logging: *formatted-logging

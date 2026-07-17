@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 import httpx
 
-from generation_setting_picker import pick_random_caption_settings
+from clients.generation_setting_picker import pick_random_caption_settings
 
 
 LLM_HOST = os.environ['LLM_HOST']
@@ -35,7 +35,7 @@ class OllamaChatResponse(BaseModel):
     eval_duration: Optional[int] = None
 
 
-class LLMService:
+class LLMClient:
     def __init__(self, trigger_word: str) -> None:
         self.trigger_word = trigger_word
 
@@ -90,7 +90,7 @@ class LLMService:
                             "Do not describe her baseline natural features (hair color, eye color, body type).\n"
                             "5. For each prompt line, independently choose one Shot Type, one Perspective, and one Pose from these pools:\n"
                             "   - Shot Types: [close up, portrait, bust shot, medium shot, full body]\n"
-                            "   - Perspectives: [selfie, not selfie]\n"
+                            "   - Perspectives: [selfie, photo]\n"
                             "   - Poses: [standing, sitting, lying]\n"
                             "6. Make decisions on your own to mix and match them creatively."
                             "Ensure every single prompt line uses a unique configuration so they are completely distinct from one another.\n"
@@ -128,8 +128,10 @@ class LLMService:
 
         except httpx.HTTPStatusError as e:
             print(f"Server error {e.response.status_code}: {e.response.text}")
+            raise
         except httpx.RequestError as e:
             print(f"Network error occurred: {e}")
+            raise
 
         else:
             print("Successful LLM response")

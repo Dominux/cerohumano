@@ -11,7 +11,7 @@
   },
   "67": {
     "inputs": {
-      "text": "Asian, Han Chinese, Korean, Japanese, East Asian features, monolids, stereotypical Asian beauty",
+      "text": "NSFW, explicit nudity, Asian, Han Chinese, Korean, Japanese, East Asian features, monolids, stereotypical Asian beauty",
       "clip": ["57:30", 0]
     },
     "class_type": "CLIPTextEncode",

@@ -1,6 +1,9 @@
 from pathlib import Path
 from typing import Any
 
+import aiofiles
+from fastapi import UploadFile
+
 from app.services.base import BaseService
 from app.repositories import AttachmentRepository
 from app.models import AttachmentModel, AttachmentType
@@ -26,15 +29,16 @@ class AttachmentService(BaseService[AttachmentModel]):
 
         return full_dir / Path(str(attach.id)).with_suffix(suffix)
 
-    async def create(self, payload: dict[str, Any], content: bytes) -> AttachmentModel:
+    async def create(self, payload: dict[str, Any], file: UploadFile) -> AttachmentModel:
         attach = await super().create(payload)
-        self._save_file(attach, content)
+        await self._save_file(attach, file)
         return attach
 
-    def _save_file(self, attach: AttachmentModel, content: bytes):
+    async def _save_file(self, attach: AttachmentModel, file: UploadFile):
         filepath = self._get_filepath(attach)
-        with filepath.open('wb') as f:
-            f.write(content)
+        async with aiofiles.open(filepath, "wb") as out_file:
+            while chunk := await file.read(1024 * 64):  # Read in 64kb chunks
+                await out_file.write(chunk)
 
     def _get_file(self, attach: AttachmentModel):
         return self._get_filepath(attach)

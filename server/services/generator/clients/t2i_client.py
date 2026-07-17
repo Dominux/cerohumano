@@ -18,11 +18,11 @@ T2I_TIMEOUT = httpx.Timeout(
 )
 
 
-with open("ZIT_cerohumano_workflow.json", "r") as f:
+with open("./clients/ZIT_cerohumano_workflow.json", "r") as f:
     WORKFLOW = json.load(f)
 
 
-class T2IService:
+class T2IClient:
     def __init__(self, trigger_word: str, lora_name: str) -> None:
         self.trigger_word = trigger_word
         self.lora_name = lora_name

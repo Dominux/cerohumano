@@ -19,8 +19,10 @@ FROM base AS runtime
 COPY --from=builder /runtime /usr/local
 
 WORKDIR /src
-COPY ./alembic.ini ./
-COPY ./services/generator/* ./
+COPY ./services/generator/run.sh ./
+COPY ./services/generator/main.py ./
+COPY ./services/generator/clients ./clients
+COPY ./services/generator/queue_manager.py ./
 COPY ./app ./app
 RUN chmod +x run.sh
 

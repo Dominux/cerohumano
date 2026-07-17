@@ -4,12 +4,10 @@ import logging
 import random
 import sys
 
-from app.repositories import JobRepository, CeroHumanoRepository, PostRepository
-from app.models import JobStatus, JobType, JobModel, AttachmentType
-from app.services import AttachmentService
+from app.repositories import JobRepository, CeroHumanoRepository
+from app.models import JobStatus, JobType, JobModel
 from app.common.database import get_db_context
-from t2i_service import T2IService
-from llm_service import LLMService
+from clients import LLMClient, T2IClient, ServerClient
 
 
 logger = logging.getLogger("worker")
@@ -92,46 +90,34 @@ class QueueManager:
             )
 
         if job.job_type == JobType.POST:
-            caption, images = await self._generate_post(job)
+            await self._generate_post(job)
         else:
             logger.error(f'Unexpected job type: {job.job_type}')
             return
 
         async with get_db_context() as session:
-            attach_service = AttachmentService(session)
-            post = await PostRepository(session).create(
-                {
-                    'title': caption,
-                    'author': job.cerohumano,
-                }
-            )
-            for img in images:
-                img = await attach_service.create(
-                    payload={
-                        'post': post,
-                        'file_type': AttachmentType.IMAGE,
-                        'author': job.cerohumano,
-                    },
-                    content=img,
-                )
-
             await repo.update(job.id, update_data={'status': JobStatus.DONE})
 
     async def _generate_post(self, job: 'JobModel'):
         images_amount = random.randint(3, 4)
 
-        t2i_service = T2IService(job.cerohumano.trigger_word, job.cerohumano.lora_name)
+        t2i_service = T2IClient(job.cerohumano.trigger_word, job.cerohumano.lora_name)
         # for case if it were already loaded
         await t2i_service.unload_model()
 
-        llm_service = LLMService(job.cerohumano.trigger_word)
+        llm_service = LLMClient(job.cerohumano.trigger_word)
         caption, prompts = await llm_service.generate_post(images_amount)
 
         print('\n\n', caption, prompts)
 
         images = [await t2i_service.generate(prompt) for prompt in prompts]
         await t2i_service.unload_model()
-        return caption, images
+
+        await ServerClient().upload_post(
+            author_id=job.cerohumano_id,
+            caption=caption,
+            files=images,
+        )
 
     def stop(self):
         """Signals the background runner loop to halt execution."""
