@@ -5,3 +5,6 @@
 
 /llm/models/*
 !/llm/models/.gitkeep
+
+/certificates/*
+!/certificates/.gitkeep
