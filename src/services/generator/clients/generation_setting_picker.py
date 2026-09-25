@@ -153,7 +153,7 @@ PLACES = (
 
 
 ALL_CAPTION_CATEGORIES = (
-    CLOTHES,
+    # CLOTHES,
     DAYTIMES,
     ENVIRONMENT_SETTINGS,
     IN_OUT_DOORS,
@@ -171,4 +171,8 @@ def pick_random_caption_settings():
 
     # 2. picking one token from each chosen categories
     return [random.choice(category) for category in categories]
+
+
+def pick_random_clothes():
+    return random.choice(CLOTHES)
 

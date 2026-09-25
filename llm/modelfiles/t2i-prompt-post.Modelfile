@@ -1,5 +1,5 @@
 # Use the Qwen 3.5 base model
-FROM /app/models/qwen3.5.gguf
+FROM /app/models/qwen2.5-abliterated.gguf
 
 # Adjust parameters for high creativity while keeping output structured
 PARAMETER temperature 0.85

@@ -1,6 +1,6 @@
-/server/venv
-/server/__pycache__
-/server/migrations/__pycache__
+/src/venv
+/src/__pycache__
+/src/migrations/__pycache__
 /.env
 
 /llm/models/*

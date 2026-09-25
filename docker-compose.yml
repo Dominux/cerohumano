@@ -20,38 +20,38 @@ x-logging: &formatted-logging
     max-buffer-size: '4m'
 
 services:
-  cerohumano-server:
-    container_name: cerohumano_server
-    image: cerohumano-server
-    build:
-      context: ./server
-      dockerfile: ./services/server/Dockerfile
-    tty: true
-    restart: always
-    depends_on:
-      - cerohumano-db
-    # ports:
-    #   - ${SERVER_PORT:-18777}:8000
-    env_file:
-      - .env
-    logging: *formatted-logging
-    volumes:
-      - cerohumano-fs-volume:/data
-    networks:
-      - cerohumano-network
+  # cerohumano-server:
+  #   container_name: cerohumano_server
+  #   image: cerohumano-server
+  #   build:
+  #     context: ./src
+  #     dockerfile: ./services/server/Dockerfile
+  #   tty: true
+  #   restart: always
+  #   depends_on:
+  #     - cerohumano-db
+  #   # ports:
+  #   #   - ${SERVER_PORT:-18777}:8000
+  #   env_file:
+  #     - .env
+  #   logging: *formatted-logging
+  #   volumes:
+  #     - cerohumano-fs-volume:/data
+  #   networks:
+  #     - cerohumano-network
 
   cerohumano-generator:
     container_name: cerohumano_generator
     image: cerohumano-generator
     build:
-      context: ./server
+      context: ./src
       dockerfile: ./services/generator/Dockerfile
     tty: true
     restart: always
     depends_on:
       - cerohumano-db
       - cerohumano-llm
-      - cerohumano-server
+      # - cerohumano-server
     env_file:
       - .env
     logging: *formatted-logging
@@ -103,16 +103,16 @@ services:
     networks:
       - cerohumano-network
 
-  cerohumano_nginx:
-    image: nginx:alpine
-    container_name: cerohumano_nginx_proxy
-    restart: always
-    ports:
-      - '80:80' # Exposed to the host / public internet
-      - '443:443' # Exposed to the host / public internet
-    networks:
-      - cerohumano-network
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - cerohumano-fs-volume:/var/www/static/:ro
-      - ./certificates:/etc/letsencrypt/live/cerohumano:ro
+  # cerohumano_nginx:
+  #   image: nginx:alpine
+  #   container_name: cerohumano_nginx_proxy
+  #   restart: always
+  #   ports:
+  #     - '80:80' # Exposed to the host / public internet
+  #     - '443:443' # Exposed to the host / public internet
+  #   networks:
+  #     - cerohumano-network
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - cerohumano-fs-volume:/var/www/static/:ro
+  #     - ./certificates:/etc/letsencrypt/live/cerohumano:ro
