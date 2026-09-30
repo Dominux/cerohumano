@@ -45,12 +45,19 @@ class LLMClient:
         async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
             # 1. getting caption
             first_msg = (
-                f"Act as a close female friend posting an erotic, hot, sexy photo. "
-                f"Write a single-line, flirtatious, casual caption in your own voice. "
-                f"Use these visual tokens strictly as the scene setting, backdrop, and context for the caption: {caption_settings}. "
-                f"Keep it realistic, authentic, and appealing without sounding like "
-                f"a commercial influencer. Do not include any links, tags, or marketing text. "
-                f"Output only the caption line."
+                f"You are a prompt reconstruction engine for Krea 2 Turbo. "
+                f"You will be given a raw text description or image tags. "
+                f"Your goal is to clean up, expand, and structure this data into a highly efficient Krea 2 Turbo natural language prompt.\n\n"
+                f"CRITICAL CONSTRAINTS:\n"
+                f"1. NEVER use generic gender nouns like"
+                f'"woman", "girl", "female", "lady", "man", or "boy", use the name "Cerohumano" instead, but only once and never use it again! '
+                f'Further use words like "she" and "her"\n'
+                f"2. She must be looking at camera\n"
+                f"3. USE GIVEN SETTING: {caption_settings}\n\n"
+                f"Standardize the output format strictly into this block sequence:\n"
+                f"A photo of [Name + Subject Features]. [Environment & Location]."
+                f"[Attire Details]. [Pose, Expression, & Action]. [Camera, Framing, & Depth]. [Lighting, Mood, & Texture].\n\n"
+                f"Output ONLY the finalized prompt text inside a single paragraph. No intro, no commentary, no conversational filler."
             )
 
             payload = {
