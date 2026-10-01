@@ -4,7 +4,14 @@ from typing import List, Optional
 from pydantic import BaseModel
 import httpx
 
-from clients.generation_setting_picker import pick_random_caption_settings
+from clients.generation_setting_picker import (
+    pick_random_clothes,
+    pick_random_looking_direction,
+    pick_random_settings,
+    pick_random_camera_angle,
+    pick_random_crop,
+    pick_random_photo_type,
+)
 
 
 LLM_HOST = os.environ['LLM_HOST']
@@ -40,86 +47,64 @@ class LLMClient:
         self.trigger_word = trigger_word
 
     async def generate_post(self, images_amount=4) -> 'tuple[str, list[str]]':
-        caption_settings = pick_random_caption_settings()
+        post_settings = pick_random_settings()
+        clothes = pick_random_clothes()
+
+        prompts = []
 
         async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
-            # 1. getting caption
-            first_msg = (
-                f"You are a prompt reconstruction engine for Krea 2 Turbo. "
-                f"You will be given a raw text description or image tags. "
-                f"Your goal is to clean up, expand, and structure this data into a highly efficient Krea 2 Turbo natural language prompt.\n\n"
-                f"CRITICAL CONSTRAINTS:\n"
-                f"1. NEVER use generic gender nouns like"
-                f'"woman", "girl", "female", "lady", "man", or "boy", use the name "Cerohumano" instead, but only once and never use it again! '
-                f'Further use words like "she" and "her"\n'
-                f"2. She must be looking at camera\n"
-                f"3. USE GIVEN SETTING: {caption_settings}\n\n"
-                f"Standardize the output format strictly into this block sequence:\n"
-                f"A photo of [Name + Subject Features]. [Environment & Location]."
-                f"[Attire Details]. [Pose, Expression, & Action]. [Camera, Framing, & Depth]. [Lighting, Mood, & Texture].\n\n"
-                f"Output ONLY the finalized prompt text inside a single paragraph. No intro, no commentary, no conversational filler."
-            )
+            for photo_number in range(images_amount):
+                msg_settings = post_settings.copy()
+                msg_settings['photo crop'] = pick_random_crop()
+                msg_settings['camera angle'] = pick_random_camera_angle()
+                msg_settings['photo type'] = pick_random_photo_type()
+                msg_settings['looking direction'] = pick_random_looking_direction()
 
-            payload = {
-                "model": "t2i-prompt-post",
-                "stream": False,
-                "think": False,
-                "keep_alive": 0, # to unload the model after the request
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": first_msg,
-                    },
-                ],
-            }
+                if photo_number is 0:
+                    msg_settings['clothes'] = clothes
+                elif photo_number is 1:
+                    msg_settings['clothes'] = clothes
+                    msg_settings['nudity'] = 'topless'
+                else:
+                    msg_settings['nudity'] = 'completely naked'
 
-            caption = await self._request_llm(client, payload)
+                msg_content = (
+                    f"You are a prompt reconstruction engine for Krea 2 Turbo. "
+                    f"You will be given a raw text description or image tags. "
+                    f"Your goal is to clean up, expand, and structure this data into a highly efficient Krea 2 Turbo natural language prompt.\n\n"
+                    f"CRITICAL CONSTRAINTS:\n"
+                    f"1. NEVER use generic gender nouns like"
+                    f'"woman", "girl", "female", "lady", "man", or "boy", use the name "Cerohumano" instead, but only once and never use it again! '
+                    f'Further use words like "she" and "her"\n'
+                    f"2. She must be looking at camera\n"
+                    f"3. USE GIVEN SETTING: {msg_settings}\n\n"
+                    f"Standardize the output format strictly into this block sequence:\n"
+                    f"A [Camera Angle, Photo Type, & Photo Crop] of [Name + Subject Features]. [Attire Details]. "
+                    f"[Pose, Expression, & Action]. [Environment & Location]. [Camera, Framing, & Depth]. [Lighting, Mood, & Texture].\n\n"
+                    f"Output ONLY the finalized prompt text inside a single paragraph. No intro, no commentary, no conversational filler."
+                )
 
-            # 2. getting prompts list
-            payload['messages'].extend(
-                [
-                    {
-                        "role": "assistant",
-                        "content": caption,
-                    },
-                    {
-                        "role": "user",
-                        "content": (
-                            "Perfect. Now, based EXACTLY on the vibe, outfit, "
-                            f"and setting implied in that caption, generate exactly {images_amount} distinct, "
-                            "highly appealing, and striking image generation prompts (one per line) "
-                            "for a single continuous photo session.\n\nFollow these rules perfectly:\n"
-                            "1. Describe the scene directly from a cinematic camera perspective.\n"
-                            "2. You MUST include the exact trigger word \"cerohumano\" in every single prompt line to represent her.\n"
-                            "3. Use pronouns like \"she\" or \"her\" to describe her positioning "
-                            "and actions naturally from the camera's point of view.\n"
-                            "4. Do NOT use generic words like \"girl\", \"woman\", \"model\", or \"lady\". "
-                            "Do not describe her baseline natural features (hair color, eye color, body type).\n"
-                            "5. For each prompt line, independently choose one Shot Type, one Perspective, and one Pose from these pools:\n"
-                            "   - Shot Types: [close up, portrait, bust shot, medium shot, full body]\n"
-                            "   - Perspectives: [selfie, photo]\n"
-                            "   - Poses: [standing, sitting, lying]\n"
-                            "6. Make decisions on your own to mix and match them creatively."
-                            "Ensure every single prompt line uses a unique configuration so they are completely distinct from one another.\n"
-                            "7. Focus heavily on her alluring styling, the textures of her clothing (matching the caption), "
-                            "realistic lighting, professional camera angles, and hot, natural poses to make the shots "
-                            "look incredibly attractive and real. Do not include numbers or bullet points."
-                        ),
-                    },
-                ]
-            )
+                payload = {
+                    "model": "t2i-prompt-post",
+                    "stream": False,
+                    "think": False,
+                    "keep_alive": 0, # to unload the model after the request
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": msg_content,
+                        },
+                    ],
+                }
 
-            prompts_text = await self._request_llm(client, payload)
-            prompts = []
-            for line in reversed(prompts_text.splitlines()):
-                if BASE_TRIGGER_WORD in line:
-                    prompt = line.replace(BASE_TRIGGER_WORD, self.trigger_word)
-                    prompts.append(prompt)
+                prompt = await self._request_llm(client, payload)
 
-                    if len(prompts) == images_amount:
-                        break
+                # cleaning prompt
+                prompt = prompt.lower().replace(BASE_TRIGGER_WORD, self.trigger_word)
 
-            return caption, prompts
+                prompts.append(prompt)
+
+            return '❤️❤️❤️', prompts
 
     @staticmethod
     async def _request_llm(client, payload) -> str:

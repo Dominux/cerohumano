@@ -150,10 +150,29 @@ PLACES = (
     'santorini caldera',
     'maldives',
 )
+CAMERA_ANGLES = (
+    ('eye-level', 70),
+    ('low-angle', 15),
+    ('high-angle', 15),
+)
+PHOTO_TYPES = (
+    'photo',
+    'shot',
+    'selfie',
+)
+CROPS = (
+    'close-up',
+    'bust shot',
+    'midshot',
+    'full body shot',
+)
+LOOKING_DIRECTION = (
+    ('looking in camera', 70),
+    ('not looking in camera', 30),
+)
 
-
-ALL_CAPTION_CATEGORIES = (
-    ('clothes', CLOTHES),
+POST_CATEGORIES = (
+    # ('clothes', CLOTHES),
     ('daytime', DAYTIMES),
     ('environment', ENVIRONMENT_SETTINGS),
     ('location', IN_OUT_DOORS),
@@ -164,11 +183,30 @@ ALL_CAPTION_CATEGORIES = (
 )
 
 
-def pick_random_caption_settings():
+def pick_random_settings():
     # 1. picking categories
-    categories_amount = random.randint(5, len(ALL_CAPTION_CATEGORIES))
-    categories = random.sample(ALL_CAPTION_CATEGORIES, categories_amount)
+    categories_amount = random.randint(5, len(POST_CATEGORIES))
+    categories = random.sample(POST_CATEGORIES, categories_amount)
 
     # 2. picking one token from each chosen categories
     return {k: random.choice(v) for k, v in categories}
 
+def pick_random_clothes():
+    return random.choice(CLOTHES)
+
+def pick_random_camera_angle():
+    options, percentages = zip(*CAMERA_ANGLES)
+    return random.choices(options, weights=percentages, k=1)[0]
+
+def pick_random_photo_type():
+    return random.choice(PHOTO_TYPES)
+
+def pick_random_crop():
+    return random.choice(CROPS)
+
+def pick_random_looking_direction():
+    options, percentages = zip(*LOOKING_DIRECTION)
+    return random.choices(options, weights=percentages, k=1)[0]
+
+def pick_random_seed():
+    return random.randint(0, 2**32 - 1)
