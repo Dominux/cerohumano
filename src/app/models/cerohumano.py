@@ -25,7 +25,7 @@ class CeroHumanoModel(Base):
 
     trigger_word: Mapped[str] = mapped_column(nullable=False, unique=True)
     lora_name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    min_cup: Mapped[CeroHumanoCupDescription] = mapped_column()
+    min_cup: Mapped[CeroHumanoCupDescription] = mapped_column(nullable=True)
 
     profile_picture_id: Mapped[uuid.UUID | None] = mapped_column(
         sa.UUID(as_uuid=True),

@@ -29,9 +29,9 @@ class AttachmentService(BaseService[AttachmentModel]):
 
         return full_dir / Path(str(attach.id)).with_suffix(suffix)
 
-    async def create(self, payload: dict[str, Any], file: UploadFile) -> AttachmentModel:
+    async def create(self, payload: dict[str, Any], content: UploadFile) -> AttachmentModel:
         attach = await super().create(payload)
-        await self._save_file(attach, file)
+        await self._save_file(attach, content)
         return attach
 
     async def _save_file(self, attach: AttachmentModel, file: UploadFile):

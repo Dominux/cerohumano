@@ -8,6 +8,7 @@ from app.repositories import JobRepository, CeroHumanoRepository
 from app.models import JobStatus, JobType, JobModel
 from app.common.database import get_db_context
 from clients import LLMClient, T2IClient, ServerClient
+from clients.generation_setting_picker import pick_random_seed
 
 
 logger = logging.getLogger("worker")
@@ -110,14 +111,16 @@ class QueueManager:
 
         print('\n\n', caption, prompts)
 
-        images = [await t2i_service.generate(prompt) for prompt in prompts]
+        seed = pick_random_seed()
+
+        images = [await t2i_service.generate(prompt, seed=seed) for prompt in prompts]
         await t2i_service.unload_model()
 
-        await ServerClient().upload_post(
-            author_id=job.cerohumano_id,
-            caption=caption,
-            files=images,
-        )
+        # await ServerClient().upload_post(
+        #     author_id=job.cerohumano_id,
+        #     caption=caption,
+        #     files=images,
+        # )
 
     def stop(self):
         """Signals the background runner loop to halt execution."""

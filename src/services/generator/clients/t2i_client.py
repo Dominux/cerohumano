@@ -18,7 +18,7 @@ T2I_TIMEOUT = httpx.Timeout(
 )
 
 
-with open("./clients/ZIT_cerohumano_workflow.json", "r") as f:
+with open("./clients/Krea2Turbo_cerohumano_workflow.json", "r") as f:
     WORKFLOW = json.load(f)
 
 
@@ -27,19 +27,18 @@ class T2IClient:
         self.trigger_word = trigger_word
         self.lora_name = lora_name
 
-    async def generate(self, prompt: str) -> bytes:
+    async def generate(self, prompt: str, seed=42) -> bytes:
         async with httpx.AsyncClient(timeout=T2I_TIMEOUT) as client:
             wf = copy.deepcopy(WORKFLOW)
 
             # positive prompt
-            positive_prompt_inputs = wf["57:27"]["inputs"]
-            positive_prompt_inputs["text"] = f"{prompt} {positive_prompt_inputs['text']}"
+            wf["250:244"]["inputs"]['text'] = prompt
 
             # lora name
-            wf["57:69"]["inputs"]["lora_name"] = self.lora_name
+            wf["250:241"]["inputs"]["lora_name"] = self.lora_name
 
             # seed
-            wf["57:86"]["inputs"]["seed"] = random.randint(0, 18446744073709551615)
+            wf["250:248"]["inputs"]["seed"] = seed
 
             return await self._request_comfy(client, wf)
 
