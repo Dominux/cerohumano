@@ -24,7 +24,7 @@ services:
     container_name: cerohumano_server
     image: cerohumano-server
     build:
-      context: ./src
+      context: ./backend
       dockerfile: ./services/server/Dockerfile
     tty: true
     restart: always
@@ -44,7 +44,7 @@ services:
     container_name: cerohumano_generator
     image: cerohumano-generator
     build:
-      context: ./src
+      context: ./backend
       dockerfile: ./services/generator/Dockerfile
     tty: true
     restart: always
