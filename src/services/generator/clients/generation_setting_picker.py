@@ -1,5 +1,7 @@
 import random
 
+from app.models.cerohumano import CeroHumanoCupDescription
+
 
 SEASONS = (
     'winter',
@@ -170,6 +172,13 @@ LOOKING_DIRECTION = (
     ('looking in camera', 70),
     ('not looking in camera', 30),
 )
+POSITIONS = (
+    'staying',
+    'sitting',
+    'lying',
+)
+
+CUP_PERCENTAGES = (20, 15, 11, 8, 6, 5)
 
 POST_CATEGORIES = (
     # ('clothes', CLOTHES),
@@ -208,5 +217,15 @@ def pick_random_looking_direction():
     options, percentages = zip(*LOOKING_DIRECTION)
     return random.choices(options, weights=percentages, k=1)[0]
 
+def pick_random_position():
+    return random.choice(POSITIONS)
+
 def pick_random_seed():
     return random.randint(0, 2**32 - 1)
+
+def pick_random_cup(min_cup: CeroHumanoCupDescription):
+    larger_cups = [None, *[m for m in CeroHumanoCupDescription if min_cup is None or m >= min_cup]]
+    percentages = [*CUP_PERCENTAGES[:len(larger_cups) - 1]]
+    percentages.insert(0, 100 - sum(percentages))
+
+    return random.choices(larger_cups, weights=percentages, k=1)[0]

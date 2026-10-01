@@ -3,10 +3,16 @@ import uuid
 from pydantic import BaseModel, Field
 
 from app.schemas.base import BaseSchema
+from app.models.cerohumano import CeroHumanoCupDescription
+
+
+
+class CeroHumanoCupDescriptionSchema(BaseModel):
+    min_cup: CeroHumanoCupDescription | None = Field(description="Minimal cup for cerohumano", default=None)
 
 
 # 1. The structural Request Contract payload
-class CeroHumanoCreate(BaseModel):
+class CeroHumanoCreate(CeroHumanoCupDescriptionSchema):
     username: str = Field(..., max_length=255, description="Unique identity handle")
     first_name: str = Field(..., max_length=255)
     last_name: str = Field(..., max_length=255)
@@ -20,3 +26,7 @@ class CeroHumanoResponse(BaseSchema, CeroHumanoCreate):
 
     # Optional field matching profile_picture_id
     profile_picture_id: uuid.UUID | None = Field(default=None)
+
+
+class CeroHumanoSetCup(CeroHumanoCupDescriptionSchema, BaseSchema):
+    ...

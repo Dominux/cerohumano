@@ -5,6 +5,7 @@ import sqlalchemy as sa
 
 from app.models import CeroHumanoModel
 from app.repositories.base import BaseRepository
+from app.schemas.cerohumano import CeroHumanoSetCup
 
 
 class CeroHumanoRepository(BaseRepository[CeroHumanoModel]):
@@ -16,3 +17,6 @@ class CeroHumanoRepository(BaseRepository[CeroHumanoModel]):
         # Execute asynchronously using scalars directly
         result = await self.session.scalars(stmt)
         return result.all()
+
+    async def set_cup(self, cerohumano: CeroHumanoSetCup):
+        return await self.update(cerohumano.id, {'min_cup': cerohumano.min_cup})

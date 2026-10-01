@@ -16,6 +16,7 @@ T2I_TIMEOUT = httpx.Timeout(
     read=None,          # DISABLE read timeout so slow image generation won't crash your script
     write=30.0          # Time allowed to upload your workflow JSON or heavy input images
 )
+IMAGE_NODE_NUMBER = '237'
 
 
 with open("./clients/Krea2Turbo_cerohumano_workflow.json", "r") as f:
@@ -92,11 +93,12 @@ class T2IClient:
             return
 
         outputs = job_data.get("outputs", {})
-        # 1. Safely extract metadata from Node 66
-        if not ("66" in outputs and "images" in outputs["66"]):
+        print(outputs)
+        # 1. Safely extract metadata from Node
+        if not (IMAGE_NODE_NUMBER in outputs and "images" in outputs[IMAGE_NODE_NUMBER]):
             return
 
-        image_list = outputs["66"]["images"]
+        image_list = outputs[IMAGE_NODE_NUMBER]["images"]
 
         if not image_list:
             return

@@ -41,7 +41,6 @@ async def upload_profile_picture(
 
     # 3. Creating
     payload = {'author_id': author_id}
-    # content = await file.read()
     attach = await AttachmentService(db).create(payload, content=file)
 
     # 4. Assigning as a profile picture

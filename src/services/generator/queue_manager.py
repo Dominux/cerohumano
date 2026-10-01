@@ -106,21 +106,21 @@ class QueueManager:
         # for case if it were already loaded
         await t2i_service.unload_model()
 
-        llm_service = LLMClient(job.cerohumano.trigger_word)
+        llm_service = LLMClient(job.cerohumano.trigger_word, job.cerohumano.min_cup)
         caption, prompts = await llm_service.generate_post(images_amount)
 
-        print('\n\n', caption, prompts)
+        print('\n\n', caption, *prompts, sep='\n')
 
         seed = pick_random_seed()
 
         images = [await t2i_service.generate(prompt, seed=seed) for prompt in prompts]
         await t2i_service.unload_model()
 
-        # await ServerClient().upload_post(
-        #     author_id=job.cerohumano_id,
-        #     caption=caption,
-        #     files=images,
-        # )
+        await ServerClient().upload_post(
+            author_id=job.cerohumano_id,
+            caption=caption,
+            files=images,
+        )
 
     def stop(self):
         """Signals the background runner loop to halt execution."""

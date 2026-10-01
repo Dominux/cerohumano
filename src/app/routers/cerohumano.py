@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from app.common.database import get_db  # Your pure async generator helper dependency
-from app.schemas import CeroHumanoCreate, CeroHumanoResponse
+from app.schemas import CeroHumanoCreate, CeroHumanoResponse, CeroHumanoSetCup
 from app.services import CeroHumanoService
 
 
@@ -49,3 +49,17 @@ async def list_cerohumanos(db: AsyncSession = Depends(get_db)):
     Supports optional dictionary filtering mapped natively via the ORM repository layer.
     """
     return await CeroHumanoService(db).list()
+
+
+@router.patch(
+    "/min_cup",
+    response_model=CeroHumanoResponse,
+)
+async def set_cup(
+    cerohumano: CeroHumanoSetCup,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sets minimal cup
+    """
+    return await CeroHumanoService(db).set_cup(cerohumano)

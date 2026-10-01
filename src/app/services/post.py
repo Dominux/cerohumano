@@ -25,13 +25,13 @@ class PostService(BaseService[PostModel]):
         # creaing attachs
         attach_service = AttachmentService(self.repository.session)
         for file in files:
-            attach = await attach_service.create(
+            await attach_service.create(
                 payload={
                     'post': post,
                     'file_type': AttachmentType.IMAGE,
                     'author_id': author_id,
                 },
-                file=file,
+                content=file,
             )
 
         return post

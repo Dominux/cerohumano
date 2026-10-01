@@ -4,9 +4,12 @@ from typing import List, Optional
 from pydantic import BaseModel
 import httpx
 
+from app.models.cerohumano import CeroHumanoCupDescription
 from clients.generation_setting_picker import (
     pick_random_clothes,
+    pick_random_cup,
     pick_random_looking_direction,
+    pick_random_position,
     pick_random_settings,
     pick_random_camera_angle,
     pick_random_crop,
@@ -43,12 +46,16 @@ class OllamaChatResponse(BaseModel):
 
 
 class LLMClient:
-    def __init__(self, trigger_word: str) -> None:
+    def __init__(self, trigger_word: str, min_cup: CeroHumanoCupDescription) -> None:
         self.trigger_word = trigger_word
+        self.min_cup = min_cup
 
     async def generate_post(self, images_amount=4) -> 'tuple[str, list[str]]':
         post_settings = pick_random_settings()
         clothes = pick_random_clothes()
+        cup = pick_random_cup(self.min_cup)
+        if cup:
+            post_settings['bust'] = cup.name
 
         prompts = []
 
@@ -59,10 +66,11 @@ class LLMClient:
                 msg_settings['camera angle'] = pick_random_camera_angle()
                 msg_settings['photo type'] = pick_random_photo_type()
                 msg_settings['looking direction'] = pick_random_looking_direction()
+                msg_settings['position'] = pick_random_position()
 
-                if photo_number is 0:
+                if photo_number == 0:
                     msg_settings['clothes'] = clothes
-                elif photo_number is 1:
+                elif photo_number == 1:
                     msg_settings['clothes'] = clothes
                     msg_settings['nudity'] = 'topless'
                 else:
