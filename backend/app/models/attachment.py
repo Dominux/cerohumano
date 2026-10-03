@@ -50,4 +50,5 @@ class AttachmentModel(Base):
     post: Mapped["PostModel | None"] = relationship(
         "PostModel",
         foreign_keys=[post_id],
+        back_populates="attachments"
     )

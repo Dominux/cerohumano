@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.database import get_db
 from app.services import PostService
+from app.schemas import PostWithAttachmentsResponse
 
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
@@ -22,3 +23,17 @@ async def upload_post(
     db: AsyncSession = Depends(get_db)
 ):
     return await PostService(db).upload_post(author_id, caption, files=files)
+
+
+@router.get(
+    "",
+    response_model=list[PostWithAttachmentsResponse],
+    summary="List feed posts with multiple file attachments"
+)
+async def list_feed_posts(
+    limit: int = 10,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db)
+):
+    return await PostService(db).list_feed_posts(limit=limit, offset=offset)
+

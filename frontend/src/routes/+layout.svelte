@@ -14,11 +14,11 @@
   <header
     class="flex h-12 shrink-0 items-center justify-between border-b border-gray-100 bg-white px-4"
   >
-    <!-- Instagram styling logo lookalike -->
+    <!-- styling logo lookalike -->
     <span
       class="font-serif text-2xl font-black italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"
     >
-      Instagram
+      CeroHumano
     </span>
     <button class="active:scale-90 transition-transform duration-100">
       <Heart class="h-6 w-6 stroke-[2]" />

@@ -6,7 +6,9 @@ from app.routers import cerohumano_router, attachment_router, post_router
 from app.common.openapi import custom_openapi
 
 
-app = FastAPI()
+app = FastAPI(
+    root_path="/api"
+)
 app.openapi = custom_openapi(app)
 
 app.include_router(post_router)

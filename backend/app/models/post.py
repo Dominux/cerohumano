@@ -23,3 +23,9 @@ class PostModel(Base):
         "CeroHumanoModel",
         foreign_keys=[author_id],
     )
+
+    attachments: Mapped[list["AttachmentModel"]] = relationship(
+        "AttachmentModel",
+        back_populates="post",
+        cascade="all, delete-orphan"
+    )
