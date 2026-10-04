@@ -8,7 +8,7 @@ from queue_manager import QueueManager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    queue_manager = QueueManager(daily_posts_amount=8)
+    queue_manager = QueueManager(daily_posts_amount=10)
     daemon_task = asyncio.create_task(queue_manager.start_loop())
 
     yield

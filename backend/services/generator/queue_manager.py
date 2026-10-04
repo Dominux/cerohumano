@@ -100,7 +100,7 @@ class QueueManager:
             await repo.update(job.id, update_data={'status': JobStatus.DONE})
 
     async def _generate_post(self, job: 'JobModel'):
-        images_amount = random.randint(3, 4)
+        images_amount = random.randint(3, 5)
 
         t2i_service = T2IClient(job.cerohumano.trigger_word, job.cerohumano.lora_name)
         # for case if it were already loaded

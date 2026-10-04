@@ -23,6 +23,7 @@ class PostRepository(BaseRepository[PostModel]):
                 sa.orm.joinedload(self.model.attachments),
                 sa.orm.joinedload(self.model.author),
             )
+            .order_by(self.model.created_at.desc())
             .offset(skip)
             .limit(limit)
         )

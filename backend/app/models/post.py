@@ -27,5 +27,7 @@ class PostModel(Base):
     attachments: Mapped[list["AttachmentModel"]] = relationship(
         "AttachmentModel",
         back_populates="post",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        # Ensures they sort from oldest to newest (or use .desc() for newest first)
+        order_by="AttachmentModel.created_at.asc()",
     )

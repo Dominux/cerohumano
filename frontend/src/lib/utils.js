@@ -12,6 +12,6 @@ export function getAttachmentUrl(attachmentId) {
     return 'https://unsplash.com'
   }
 
-  const BASE_MEDIA_URL = 'http://localhost:18777/media/images'
+  const BASE_MEDIA_URL = '/media/images'
   return `${BASE_MEDIA_URL}/${attachmentId}.png`
 }
