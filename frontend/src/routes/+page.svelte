@@ -1,6 +1,8 @@
 <script>
   import * as Avatar from '#lib/components/ui/avatar'
   import { Button } from '#lib/components/ui/button'
+  import * as Carousel from '#lib/components/ui/carousel'
+  import { getAttachmentUrl } from '#lib/utils.js'
   import {
     Heart,
     MessageCircle,
@@ -10,41 +12,25 @@
     Loader2,
   } from 'lucide-svelte'
 
-  /**
-   * @typedef {Object} Post
-   * @property {number} id
-   * @property {string} username
-   * @property {string} avatarUrl
-   * @property {string[]} imageUrls
-   * @property {number} activeImageIndex
-   * @property {number} likes
-   * @property {boolean} hasLiked
-   * @property {string} caption
-   * @property {string} timeAgo
-   */
-
-  // 1. Initialize reactive arrays using Svelte 5 state variables
-  /** @type {Post[]} */
+  // 1. Properly initialized reactive states
+  /** @type {any[]} */
   let posts = $state([])
   let isLoading = $state(true)
   /** @type {string | null} */
   let errorMsg = $state(null)
 
   let lastTap = 0
-
-  // Desktop mouse drag movement configurations
   let isDown = false
   let startX = 0
   let scrollLeft = 0
 
-  // 2. Fetch data from backend on mount using asynchronous effects
   $effect(() => {
-    const controller = new AbortController() // Clean cancellation handler
+    const controller = new AbortController()
 
     async function fetchTimeline() {
       try {
         isLoading = true
-        // Swap this target placeholder with your actual local or cloud API string
+        // Hitting the local Nginx proxy endpoint directly
         const response = await fetch('http://localhost:18777/api/posts', {
           signal: controller.signal,
         })
@@ -55,20 +41,26 @@
           )
         }
 
-        /** @type {any[]} */
         const data = await response.json()
 
-        // Map data ensuring UI engine configurations exist natively
-        posts = data.map((post) => ({
-          ...post,
-          activeImageIndex: post.activeImageIndex ?? 0,
-          hasLiked: post.hasLiked ?? false,
+        // 2. Safe mapping array with explicit fallbacks for snake_case/camelCase variants
+        posts = (data || []).map((post) => ({
+          id: post.id,
+          username: post.author.username,
+          avatarUrl: getAttachmentUrl(post.author.profile_picture_id),
+          // Looks for both backend snake_case or frontend camelCase variants natively
+          imageUrls: (post.attachments || []).map((att) =>
+            getAttachmentUrl(att.id),
+          ),
+          activeImageIndex: 0,
+          likes: post.likes ?? 0,
+          hasLiked: post.has_liked || post.hasLiked || false,
+          caption: post.title,
+          timeAgo: post.time_ago || post.timeAgo || 'Just now',
         }))
       } catch (err) {
-        if (/** @type {Error} */ (err).name !== 'AbortError') {
-          errorMsg =
-            /** @type {Error} */ (err).message ||
-            'Failed to fetch timeline posts data.'
+        if (err.name !== 'AbortError') {
+          errorMsg = err.message || 'Failed to parse layout.'
         }
       } finally {
         isLoading = false
@@ -76,15 +68,9 @@
     }
 
     fetchTimeline()
-
-    // Cleanup handler unbinds network requests if user navigates away abruptly
     return () => controller.abort()
   })
 
-  /**
-   * Optimistic UI update: communicates interaction state immediately to user
-   * @param {Post} post
-   */
   async function handleLikeAction(post) {
     if (post.hasLiked) {
       post.likes -= 1
@@ -95,108 +81,57 @@
     }
 
     try {
-      // Dispatch state adjustment update upstream back to your DB channel
-      await fetch(`http://localhost:3000/api/posts/${post.id}/like`, {
+      await fetch(`/api/posts/${post.id}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hasLiked: post.hasLiked }),
       })
     } catch (err) {
-      console.error('Backend failed to register user interaction:', err)
-      // Optional: Roll back the local UI numbers array state here if database fails explicitly
+      console.error('Like tracking failed:', err)
     }
   }
 
-  /**
-   * @param {MouseEvent} e
-   * @param {Post} post
-   */
-  function handleImageClick(e, post) {
-    const target = /** @type {HTMLDivElement} */ (e.currentTarget)
-    if (target.getAttribute('data-dragged') === 'true') {
-      target.removeAttribute('data-dragged')
-      return
-    }
-
+  /** @param {Post} post */
+  function handleImageDoubleClick(post) {
     const now = Date.now()
     if (now - lastTap < 300) {
-      // Double click forces active toggle like
       if (!post.hasLiked) handleLikeAction(post)
     }
     lastTap = now
   }
 
   /**
-   * @param {Event} event
+   * Capture active indexing snapshots directly out of Embla's API engine hooks
+   * @param {any} api - The Embla API instance object reference
    * @param {Post} post
    */
-  function handleCarouselScroll(event, post) {
-    const target = /** @type {HTMLDivElement} */ (event.target)
-    const index = Math.round(target.scrollLeft / target.clientWidth)
-    post.activeImageIndex = index
-  }
-
-  /** @param {MouseEvent} e */
-  function dragStart(e) {
-    const target = /** @type {HTMLDivElement} */ (e.currentTarget)
-    isDown = true
-    target.classList.remove('scroll-smooth')
-    startX = e.pageX - target.offsetLeft
-    scrollLeft = target.scrollLeft
-  }
-
-  function dragStop() {
-    isDown = false
-  }
-
-  /** @param {MouseEvent} e */
-  function dragMove(e) {
-    if (!isDown) return
-    e.preventDefault()
-    const target = /** @type {HTMLDivElement} */ (e.currentTarget)
-    target.setAttribute('data-dragged', 'true')
-    const x = e.pageX - target.offsetLeft
-    const walk = (x - startX) * 1.5
-    target.scrollLeft = scrollLeft - walk
+  function initCarouselApi(api, post) {
+    if (!api) return
+    api.on('select', () => {
+      post.activeImageIndex = api.selectedScrollSnap()
+    })
   }
 </script>
 
 <div class="mx-auto max-w-md pb-20">
-  <!-- 1. Async Loading State Skeleton Spacer -->
   {#if isLoading}
     <div
       class="flex h-[60vh] flex-col items-center justify-center text-zinc-400 gap-2"
     >
       <Loader2 class="h-8 w-8 animate-spin text-zinc-500" />
-      <p class="text-sm tracking-wide font-medium">Fetching feed updates...</p>
+      <p class="text-sm font-medium">Loading CeroHumano...</p>
     </div>
-
-    <!-- 2. Connection Network Errors Indicator Banner -->
   {:else if errorMsg}
     <div
       class="mx-4 my-8 rounded-xl border border-red-100 bg-red-50/50 p-4 text-center text-xs text-red-600"
     >
-      <p class="font-bold">Database Sync Warning</p>
+      <p class="font-bold">App Error</p>
       <p class="mt-1 font-medium">{errorMsg}</p>
     </div>
-
-    <!-- 3. Empty Feed State Placeholder -->
-  {:else if posts.length === 0}
-    <div
-      class="flex h-[50vh] flex-col items-center justify-center text-center text-zinc-400 px-6"
-    >
-      <p class="text-sm font-semibold text-zinc-800">No Posts Available</p>
-      <p class="text-xs mt-1 text-zinc-500">
-        Your profile network feed is currently waiting for active database
-        creation rows.
-      </p>
-    </div>
-
-    <!-- 4. Active Feed Render Grid Stream -->
   {:else}
     {#each posts as post (post.id)}
       <article class="mb-4 border-b border-gray-100 bg-white">
-        <!-- Header Card Details Grid -->
+        <!-- Post Header -->
         <div class="flex items-center justify-between p-3">
           <div class="flex items-center gap-3">
             <Avatar.Root class="h-8 w-8 ring-2 ring-pink-500 ring-offset-2">
@@ -216,33 +151,39 @@
           >
         </div>
 
-        <!-- Media Gallery Core Component Canvas -->
-        <div class="relative w-full aspect-[3/4]">
-          <div
-            class="flex h-full w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar select-none cursor-grab active:cursor-grabbing"
-            onscroll={(e) => handleCarouselScroll(e, post)}
-            onmousedown={dragStart}
-            onmouseleave={dragStop}
-            onmouseup={dragStop}
-            onmousemove={dragMove}
-            onclick={(e) => handleImageClick(e, post)}
+        <!--
+					Embla Powered Media Slider Box:
+					- Handles multi-device drag inertia natively
+					- setApi hooks into index adjustments automatically
+				-->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
+        <div
+          class="relative w-full aspect-[3/4]"
+          onclick={() => handleImageDoubleClick(post)}
+        >
+          <Carousel.Root
+            setApi={(api) => initCarouselApi(api, post)}
+            opts={{ loop: false, watchDrag: true }}
+            class="w-full h-full"
           >
-            {#each post.imageUrls as imgUrl, index}
-              <div
-                class="h-full w-full shrink-0 snap-start snap-always relative bg-zinc-50 pointer-events-none"
-              >
-                <img
-                  src={imgUrl}
-                  alt="Post content slide"
-                  class="h-full w-full object-cover"
-                  loading="lazy"
-                  draggable="false"
-                />
-              </div>
-            {/each}
-          </div>
+            <Carousel.Content class="-ml-0 h-full">
+              {#each post.imageUrls as imgUrl, index}
+                <Carousel.Item class="pl-0 h-full w-full basis-full">
+                  <div class="h-full w-full relative bg-zinc-50 select-none">
+                    <img
+                      src={imgUrl}
+                      alt="Slide {index + 1}"
+                      class="h-full w-full object-cover pointer-events-none"
+                      loading="lazy"
+                    />
+                  </div>
+                </Carousel.Item>
+              {/each}
+            </Carousel.Content>
+          </Carousel.Root>
 
-          {#if post.imageUrls.length > 1}
+          <!-- Absolute Position Counter Overlay -->
+          {#if post.imageUrls && post.imageUrls.length > 1}
             <div
               class="absolute top-3 right-3 z-20 rounded-full bg-black/60 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur-sm pointer-events-none tracking-wide"
             >
@@ -251,7 +192,7 @@
           {/if}
         </div>
 
-        <!-- Interaction Toolbar Buttons Group Footer -->
+        <!-- Actions Footer Buttons Toolbar -->
         <div class="flex items-center justify-between px-3 pt-3">
           <div class="flex items-center gap-2">
             <Button
@@ -280,7 +221,8 @@
             >
           </div>
 
-          {#if post.imageUrls.length > 1}
+          <!-- Carousel Pagination Indicator Dots -->
+          {#if post.imageUrls && post.imageUrls.length > 1}
             <div class="flex items-center gap-1 pointer-events-none">
               {#each post.imageUrls as _, idx}
                 <div
@@ -301,7 +243,7 @@
           >
         </div>
 
-        <!-- Info Text Fields -->
+        <!-- Information Captions -->
         <div class="px-3 pt-2 pb-4 space-y-1 text-xs">
           <p class="font-bold text-zinc-900">
             {post.likes.toLocaleString()} likes

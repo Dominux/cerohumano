@@ -13,5 +13,6 @@ class AttachmentPostSchema(BaseSchema):
 class PostWithAttachmentsResponse(BaseSchema):
     id: uuid.UUID
     author: CeroHumanoResponse
+    title: str
     attachments: 'list[AttachmentPostSchema]'
 
