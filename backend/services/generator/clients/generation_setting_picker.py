@@ -109,6 +109,9 @@ MOODS = (
 )
 ENVIRONMENT_SETTINGS = (
     'bedroom',
+    'school',
+    'street',
+    'home',
     'luxury hotel suite',
     'neon lit alleyway',
     'minimalist living room',
@@ -177,6 +180,11 @@ POSITIONS = (
     'sitting',
     'lying',
 )
+BODY_SHAPES = (
+    'slim, slender, thin',
+    'fit, toned, shaped',
+    'medium',
+)
 
 CUP_PERCENTAGES = (20, 15, 11, 8, 6, 5)
 
@@ -229,3 +237,6 @@ def pick_random_cup(min_cup: CeroHumanoCupDescription):
     percentages.insert(0, 100 - sum(percentages))
 
     return random.choices(larger_cups, weights=percentages, k=1)[0]
+
+def pick_random_body_shape():
+    return random.choice(BODY_SHAPES)

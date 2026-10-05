@@ -6,6 +6,7 @@ import httpx
 
 from app.models.cerohumano import CeroHumanoCupDescription
 from clients.generation_setting_picker import (
+    pick_random_body_shape,
     pick_random_clothes,
     pick_random_cup,
     pick_random_looking_direction,
@@ -57,6 +58,9 @@ class LLMClient:
         if cup:
             post_settings['bust'] = cup.name
 
+            if not self.min_cup:
+                post_settings['body shape'] = pick_random_body_shape()
+
         prompts = []
 
         async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
@@ -70,6 +74,8 @@ class LLMClient:
 
                 if photo_number == 0:
                     msg_settings['clothes'] = clothes
+                    if cup:
+                        msg_settings['bust'] = f'outfit highlights her {cup.name} bust'
                 elif photo_number == 1:
                     msg_settings['clothes'] = clothes
                     msg_settings['nudity'] = 'topless'
@@ -82,10 +88,9 @@ class LLMClient:
                     f"Your goal is to clean up, expand, and structure this data into a highly efficient Krea 2 Turbo natural language prompt.\n\n"
                     f"CRITICAL CONSTRAINTS:\n"
                     f"1. NEVER use generic gender nouns like"
-                    f'"woman", "girl", "female", "lady", "man", or "boy", use the name "Cerohumano" instead, but only once and never use it again! '
+                    f'"woman", "girl", "female" or "lady", use the name "CeroHumano" instead, but only once and never use it again! '
                     f'Further use words like "she" and "her"\n'
-                    f"2. She must be looking at camera\n"
-                    f"3. USE GIVEN SETTING: {msg_settings}\n\n"
+                    f"2. USE GIVEN SETTING: {msg_settings}\n\n"
                     f"Standardize the output format strictly into this block sequence:\n"
                     f"A [Camera Angle, Photo Type, & Photo Crop] of [Name + Subject Features]. [Attire Details]. "
                     f"[Pose, Expression, & Action]. [Environment & Location]. [Camera, Framing, & Depth]. [Lighting, Mood, & Texture].\n\n"
