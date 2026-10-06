@@ -36,7 +36,10 @@ class T2IClient:
             wf["250:244"]["inputs"]['text'] = prompt
 
             # lora name
-            wf["250:241"]["inputs"]["lora_name"] = self.lora_name
+            if self.lora_name:
+                wf["250:241"]["inputs"]["lora_name"] = self.lora_name
+            else:
+                wf["250:241"]["inputs"]["strength_model"] = 0
 
             # seed
             wf["250:248"]["inputs"]["seed"] = seed

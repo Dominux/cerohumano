@@ -17,7 +17,7 @@ class CeroHumanoCreate(CeroHumanoCupDescriptionSchema):
     first_name: str = Field(..., max_length=255)
     last_name: str = Field(..., max_length=255)
     trigger_word: str = Field(..., max_length=255, description="Unique generation trigger")
-    lora_name: str = Field(..., max_length=255, description="Unique backend LoRA config file target")
+    lora_name: str | None = Field(default=None, max_length=255, description="Unique backend LoRA config file target")
 
 
 # 2. The structural Response output serialization contract
