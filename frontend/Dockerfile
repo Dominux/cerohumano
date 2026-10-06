@@ -9,6 +9,9 @@ ENV PNPM_CONFIG_MINIMUM_RELEASE_AGE=0
 ENV PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false
 ENV PNPM_CONFIG_AUDIT=false
 
+ARG VITE_APP_NAME
+ENV VITE_APP_NAME=$VITE_APP_NAME
+
 # 1. Install pnpm globally inside the build container
 RUN npm install -g pnpm
 

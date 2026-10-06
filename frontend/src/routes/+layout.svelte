@@ -1,9 +1,11 @@
 <script>
   import './layout.css'
-  import { Heart, MessageSquare } from 'lucide-svelte'
+  import { Heart } from 'lucide-svelte'
 
   /** @type {{ children: any }} */
   let { children } = $props()
+
+  const appName = import.meta.env.VITE_APP_NAME || 'CeroHumano'
 </script>
 
 <!-- Main App Wrapper: Rigid view locked to the dynamic mobile screen height -->
@@ -16,9 +18,9 @@
   >
     <!-- styling logo lookalike -->
     <span
-      class="font-serif text-2xl font-black italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"
+      class="font-serif text-2xl font-black italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-red-500 to-purple-500"
     >
-      CeroHumano
+      {appName}
     </span>
     <button class="active:scale-90 transition-transform duration-100">
       <Heart class="h-6 w-6 stroke-[2]" />

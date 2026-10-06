@@ -183,7 +183,7 @@ POSITIONS = (
 BODY_SHAPES = (
     'slim, slender, thin',
     'fit, toned, shaped',
-    'medium',
+    'voluptuous',
 )
 
 CUP_PERCENTAGES = (20, 15, 11, 8, 6, 5)

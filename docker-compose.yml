@@ -109,6 +109,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_APP_NAME=${FRONT_APP_NAME}
     environment:
       NGINX_HOST: ${NGINX_HOST}
     restart: always
