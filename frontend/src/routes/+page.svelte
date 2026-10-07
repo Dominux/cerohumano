@@ -2,6 +2,7 @@
   import * as Avatar from '#lib/components/ui/avatar'
   import { Button } from '#lib/components/ui/button'
   import * as Carousel from '#lib/components/ui/carousel'
+  import * as HoverCard from '#lib/components/ui/hover-card'
   import {
     Heart,
     MessageCircle,
@@ -16,6 +17,8 @@
    * @typedef {Object} Post
    * @property {number} id
    * @property {string} username
+   * @property {string} firstName
+   * @property {string} lastName
    * @property {string} avatarUrl
    * @property {string[]} imageUrls
    * @property {number} activeImageIndex
@@ -80,6 +83,8 @@
       const mappedPosts = (data || []).map((post) => ({
         id: post.id,
         username: post.author.username,
+        firstName: post.author.first_name,
+        lastName: post.author.last_name,
         avatarUrl: getAttachmentUrl(post.author.profile_picture_id),
         // Looks for both backend snake_case or frontend camelCase variants natively
         imageUrls: (post.attachments || []).map((att) =>
@@ -190,19 +195,93 @@
           <!-- Header -->
           <div class="flex items-center justify-between p-3">
             <div class="flex items-center gap-3">
-              <Avatar.Root class="h-8 w-8 ring-2 ring-pink-500 ring-offset-2">
-                <Avatar.Image
-                  src={post.avatarUrl}
-                  alt={post.username}
-                  class="object-cover"
-                />
-                <Avatar.Fallback
-                  >{post.username.slice(0, 2).toUpperCase()}</Avatar.Fallback
+              <HoverCard.Root openDelay={200} closeDelay={150}>
+                <HoverCard.Trigger asChild>
+                  <a
+                    href="/profile/{post.username}"
+                    class="flex items-center gap-3 hover:opacity-90 transition-opacity"
+                  >
+                    <Avatar.Root
+                      class="h-8 w-8 ring-2 ring-pink-500 ring-offset-2"
+                    >
+                      <Avatar.Image
+                        src={post.avatarUrl}
+                        alt={post.username}
+                        class="object-cover"
+                      />
+                      <Avatar.Fallback
+                        >{post.username
+                          .slice(0, 2)
+                          .toUpperCase()}</Avatar.Fallback
+                      >
+                    </Avatar.Root>
+                    <span
+                      class="text-xs font-bold text-zinc-900 hover:underline"
+                      >{post.username}</span
+                    >
+                  </a>
+                </HoverCard.Trigger>
+
+                <!--
+				FIX:
+				- Wrapped the content in a link anchor ('a href="/profile/..."')
+				- Removed the Follow button completely
+			-->
+                <HoverCard.Content
+                  class="w-72 bg-white rounded-xl shadow-xl border border-zinc-100 p-0 z-50 text-black overflow-hidden active:opacity-95 transition-opacity"
                 >
-              </Avatar.Root>
-              <span class="text-xs font-bold text-zinc-900"
-                >{post.username}</span
-              >
+                  <a
+                    href="/profile/{post.username}"
+                    class="block p-4 select-none cursor-pointer"
+                  >
+                    <div class="flex flex-col gap-4">
+                      <div class="flex items-center gap-4">
+                        <Avatar.Root
+                          class="h-16 w-16 ring-4 ring-pink-500 ring-offset-2 shrink-0"
+                        >
+                          <Avatar.Image
+                            src={post.avatarUrl}
+                            alt={post.username}
+                            class="object-cover"
+                          />
+                          <Avatar.Fallback class="text-lg font-bold"
+                            >{post.username
+                              .slice(0, 2)
+                              .toUpperCase()}</Avatar.Fallback
+                          >
+                        </Avatar.Root>
+
+                        <div class="flex flex-col min-w-0">
+                          <span
+                            class="text-sm font-bold text-zinc-900 truncate leading-none mb-1"
+                            >{post.username}</span
+                          >
+                          <span
+                            class="text-xs text-zinc-400 truncate font-medium"
+                            >{post.firstName} {post.lastName}</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- Stats Array Section (Only showing posts count) -->
+                      <div
+                        class="flex items-center justify-start border-t border-zinc-100 pt-3 px-1"
+                      >
+                        <div class="flex flex-col items-start">
+                          <span
+                            class="text-sm font-black text-zinc-900 leading-tight"
+                            >571</span
+                          >
+                          <span
+                            class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider"
+                            >posts</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </HoverCard.Content>
+              </HoverCard.Root>
             </div>
             <Button variant="ghost" size="icon" class="h-8 w-8 text-zinc-500"
               ><MoreHorizontal class="h-5 w-5" /></Button

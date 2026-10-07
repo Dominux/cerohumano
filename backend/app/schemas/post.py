@@ -15,4 +15,3 @@ class PostWithAttachmentsResponse(BaseSchema):
     author: CeroHumanoResponse
     title: str
     attachments: 'list[AttachmentPostSchema]'
-

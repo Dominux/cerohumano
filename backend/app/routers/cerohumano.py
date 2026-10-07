@@ -51,6 +51,18 @@ async def list_cerohumanos(db: AsyncSession = Depends(get_db)):
     return await CeroHumanoService(db).list()
 
 
+@router.get(
+    "/by_username/{username}",
+    response_model=CeroHumanoResponse,
+    summary="Retrieve a Cero Humano profile"
+)
+async def get_cerohumano_by_username(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+):
+    return await CeroHumanoService(db).get_by_username(username)
+
+
 @router.patch(
     "/min_cup",
     response_model=CeroHumanoResponse,

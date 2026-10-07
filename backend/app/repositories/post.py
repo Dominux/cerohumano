@@ -9,7 +9,7 @@ from app.repositories.base import BaseRepository
 class PostRepository(BaseRepository[PostModel]):
     model = PostModel
 
-    async def list_feed_posts(
+    async def list_posts_with_attachments(
         self,
         skip: int = 0,
         limit: int = 10,

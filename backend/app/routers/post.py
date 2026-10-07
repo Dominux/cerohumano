@@ -28,12 +28,19 @@ async def upload_post(
 @router.get(
     "",
     response_model=list[PostWithAttachmentsResponse],
-    summary="List feed posts with multiple file attachments"
+    summary="List posts with multiple file attachments"
 )
-async def list_feed_posts(
+async def list_posts(
     limit: int = 10,
     offset: int = 0,
+    author_id: uuid.UUID | None = None,
     db: AsyncSession = Depends(get_db)
 ):
-    return await PostService(db).list_feed_posts(limit=limit, offset=offset)
-
+    filters = {}
+    if author_id:
+        filters['author_id'] = author_id
+    return await PostService(db).list_posts(
+        limit=limit,
+        offset=offset,
+        filters=filters,
+    )

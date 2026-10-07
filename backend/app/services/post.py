@@ -36,5 +36,9 @@ class PostService(BaseService[PostModel]):
 
         return post
 
-    async def list_feed_posts(self, limit, offset):
-        return await self.repository.list_feed_posts(limit=limit, skip=offset)
+    async def list_posts(self, limit, offset, filters):
+        return await self.repository.list_posts_with_attachments(
+            limit=limit,
+            skip=offset,
+            filters=filters,
+        )

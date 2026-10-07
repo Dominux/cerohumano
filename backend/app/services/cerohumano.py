@@ -7,5 +7,8 @@ from app.models import CeroHumanoModel
 class CeroHumanoService(BaseService[CeroHumanoModel]):
     repository_class = CeroHumanoRepository
 
+    async def get_by_username(self, username: str):
+        return await self.repository.get_by_username(username)
+
     async def set_cup(self, cerohumano: CeroHumanoCupDescription):
         return await self.repository.set_cup(cerohumano)

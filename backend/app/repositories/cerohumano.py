@@ -18,5 +18,11 @@ class CeroHumanoRepository(BaseRepository[CeroHumanoModel]):
         result = await self.session.scalars(stmt)
         return result.all()
 
+    async def get_by_username(self, username: str):
+        stmt = sa.select(self.model).filter_by(username=username)
+
+        result = await self.session.scalars(stmt)
+        return result.one()
+
     async def set_cup(self, cerohumano: CeroHumanoSetCup):
         return await self.update(cerohumano.id, {'min_cup': cerohumano.min_cup})
