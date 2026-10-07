@@ -32,7 +32,7 @@
   },
   "250:241": {
     "inputs": {
-      "lora_name": "",
+      "lora_name": "krea2_identity_edit_v1_2.safetensors",
       "strength_model": 1,
       "strength_clip": 1,
       "model": ["250:239", 0],
