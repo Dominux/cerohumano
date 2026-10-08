@@ -232,7 +232,11 @@ def pick_random_seed():
     return random.randint(0, 2**32 - 1)
 
 def pick_random_cup(min_cup: CeroHumanoCupDescription):
-    larger_cups = [None, *[m for m in CeroHumanoCupDescription if min_cup is None or m >= min_cup]]
+    if min_cup:
+        larger_cups = [m for m in CeroHumanoCupDescription if m >= min_cup]
+    else:
+        larger_cups = list(CeroHumanoCupDescription)
+
     percentages = [*CUP_PERCENTAGES[:len(larger_cups) - 1]]
     percentages.insert(0, 100 - sum(percentages))
 
