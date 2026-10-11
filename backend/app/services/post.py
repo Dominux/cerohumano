@@ -42,3 +42,6 @@ class PostService(BaseService[PostModel]):
             skip=offset,
             filters=filters,
         )
+
+    async def get_post_with_attachments(self, post_id: uuid.UUID):
+        return await self.repository.get_post_with_attachments(post_id)

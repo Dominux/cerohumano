@@ -57,9 +57,7 @@ class LLMClient:
         cup = pick_random_cup(self.min_cup)
         if cup:
             post_settings['bust'] = cup.name
-
-            if not self.min_cup:
-                post_settings['body shape'] = pick_random_body_shape()
+            post_settings['body shape'] = pick_random_body_shape()
 
         prompts = []
 

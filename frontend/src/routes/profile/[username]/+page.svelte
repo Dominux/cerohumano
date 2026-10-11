@@ -194,7 +194,7 @@
               >
                 <!-- Render the first attachment thumbnail inside the layout matrix -->
                 <img
-                  src={getAttachmentUrl(post.attachments[0].id)}
+                  src={getAttachmentUrl(post.attachments[0]?.id)}
                   alt="Thumbnail"
                   class="h-full w-full object-cover select-none pointer-events-none"
                   loading="lazy"

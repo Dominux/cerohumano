@@ -44,3 +44,14 @@ async def list_posts(
         offset=offset,
         filters=filters,
     )
+
+
+@router.get(
+    "/{post_id}",
+    response_model=PostWithAttachmentsResponse,
+)
+async def get_post(
+    post_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db)
+):
+    return await PostService(db).get_post_with_attachments(post_id)

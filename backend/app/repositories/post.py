@@ -1,4 +1,5 @@
 from typing import Any, Sequence
+import uuid
 
 import sqlalchemy as sa
 
@@ -24,8 +25,6 @@ class PostRepository(BaseRepository[PostModel]):
                 sa.orm.joinedload(self.model.author),
             )
             .order_by(self.model.created_at.desc())
-            .offset(skip)
-            .limit(limit)
         )
 
         if filters:
@@ -36,4 +35,17 @@ class PostRepository(BaseRepository[PostModel]):
 
         result = await self.session.scalars(stmt)
         return result.unique().all()
+
+    async def get_post_with_attachments(self, post_id: uuid.UUID):
+        stmt = (
+            sa.select(self.model)
+            .options(
+                sa.orm.joinedload(self.model.attachments),
+                sa.orm.joinedload(self.model.author),
+            )
+            .where(self.model.id == post_id)
+        )
+
+        result = await self.session.scalars(stmt)
+        return result.unique().one()
 
