@@ -111,6 +111,7 @@ ENVIRONMENT_SETTINGS = (
     'bedroom',
     'school',
     'street',
+    'lab',
     'home',
     'luxury hotel suite',
     'neon lit alleyway',
@@ -131,6 +132,26 @@ ENVIRONMENT_SETTINGS = (
     'art gallery',
     'urban tennis court',
     'marble bathroom',
+    'ring lit vanity',
+    'silk sheet bed',
+    'led cloud ceiling room',
+    'plush velvet sofa',
+    'sunken living room floor',
+    'pampas grass corner',
+    'oversized mirror selfie station',
+    'neon angel wings wall',
+    'moody dark academic study',
+    'luxury freestanding bathtub',
+    'high-rise floor-to-ceiling windows',
+    'plush faux fur rug setup',
+    'private studio backdrop',
+    'modernist fireplace lounge',
+    'backlit curtain setup',
+    'minimalist walk-in closet',
+    'ambient rgb game station',
+    'private sauna room',
+    'tropical outdoor shower',
+    'sheer canopy bedframe',
 )
 PLACES = (
     'los angeles',
@@ -154,6 +175,27 @@ PLACES = (
     'rio de janeiro',
     'santorini caldera',
     'maldives',
+    'dubai luxury penthouse',
+    'miami yacht deck',
+    'tulum jungle resort',
+    'ibiza infinity villa',
+    'cabo san lucas resort',
+    'st tropez beach club',
+    'monaco mega yacht',
+    'beverly hills mansion pool',
+    'las vegas VIP suite',
+    'santorini infinity pool',
+    'bora bora overwater bungalow',
+    'milan luxury showroom',
+    'london mayfair hotel',
+    'nyc penthouse balcony',
+    'phuket private villa',
+    'st barts beachside',
+    'tokyo luxury highrise',
+    'amalfi coast yacht',
+    'bali private pool villa',
+    'aspen heated pool',
+
 )
 CAMERA_ANGLES = (
     ('eye-level', 70),
@@ -173,7 +215,7 @@ CROPS = (
 )
 LOOKING_DIRECTION = (
     ('looking in camera', 70),
-    ('not looking in camera', 30),
+    ('looking away', 30),
 )
 POSITIONS = (
     'staying',
@@ -181,9 +223,13 @@ POSITIONS = (
     'lying',
 )
 BODY_SHAPES = (
-    'slim, slender, thin',
-    'fit, toned, shaped',
-    'voluptuous',
+    'thin',
+    'slender',
+    'slim',
+    'fit',
+    'toned',
+    'shaped',
+    'athletic',
 )
 
 CUP_PERCENTAGES = (20, 15, 11, 8, 6, 5)

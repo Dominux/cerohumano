@@ -12,6 +12,7 @@
     Loader2,
   } from 'lucide-svelte'
   import { getAttachmentUrl } from '#lib/utils'
+  import { formatTimeAgo, getAbsoluteUrl } from '#lib/utils.js'
 
   /**
    * @typedef {Object} Post
@@ -65,9 +66,10 @@
       offset += LIMIT
 
       // Pass limit and offset as parameters to match your router setup
-      const response = await fetch(
+      const url = getAbsoluteUrl(
         `/api/posts?limit=${LIMIT}&offset=${currentOffset}`,
       )
+      const response = await fetch(url)
       if (!response.ok)
         throw new Error(`Server connection failed: ${response.status}`)
 
@@ -94,7 +96,7 @@
         likes: post.likes ?? 0,
         hasLiked: post.has_liked || post.hasLiked || false,
         caption: post.title,
-        timeAgo: post.time_ago || 'Just now',
+        timeAgo: formatTimeAgo(post.created_at),
       }))
 
       // APPEND incoming items instead of overwriting the previous feed

@@ -16,7 +16,6 @@
   function handleHomeClick(e) {
     e.preventDefault()
 
-    // --- FIX: Read the pathname directly from the state object (no .subscribe needed!) ---
     if (page.url.pathname === '/') {
       const scrollableContainer = document.querySelector('.overflow-y-auto')
       if (scrollableContainer) {

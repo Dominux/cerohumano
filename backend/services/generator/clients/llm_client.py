@@ -88,7 +88,8 @@ class LLMClient:
                     f"1. NEVER use generic gender nouns like"
                     f'"woman", "girl", "female" or "lady", use the name "CeroHumano" instead, but only once and never use it again! '
                     f'Further use words like "she" and "her"\n'
-                    f"2. USE GIVEN SETTING: {msg_settings}\n\n"
+                    f'2. Her face or occiput MUST BE PRESENTED IN FRAME'
+                    f"3. USE GIVEN SETTING: {msg_settings}\n\n"
                     f"Standardize the output format strictly into this block sequence:\n"
                     f"A [Camera Angle, Photo Type, & Photo Crop] of [Name + Subject Features]. [Attire Details]. "
                     f"[Pose, Expression, & Action]. [Environment & Location]. [Camera, Framing, & Depth]. [Lighting, Mood, & Texture].\n\n"

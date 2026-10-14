@@ -12,7 +12,11 @@
     ChevronLeft,
     Loader2,
   } from 'lucide-svelte'
-  import { getAttachmentUrl } from '#lib/utils.js'
+  import {
+    formatTimeAgo,
+    getAbsoluteUrl,
+    getAttachmentUrl,
+  } from '#lib/utils.js'
 
   /** @type {{ data: { id: string } }} */
   let { data } = $props()
@@ -34,7 +38,8 @@
           errorMsg = null
 
           // Request detailed parameters for one targeted post ID
-          const response = await fetch(`/api/posts/${data.id}`, {
+          const url = getAbsoluteUrl(`/api/posts/${data.id}`)
+          const response = await fetch(url, {
             signal: controller.signal,
           })
           if (!response.ok) throw new Error('This post could not be found.')
@@ -44,9 +49,7 @@
           // Format response parameters securely into layout state properties
           post = {
             id: rawData.id,
-            username:
-              `${rawData.author.first_name} ${rawData.author.last_name}` ||
-              'unknown_user',
+            username: rawData.author.username,
             avatarUrl: getAttachmentUrl(
               rawData.author.profile_picture_id || '',
             ),
@@ -56,7 +59,7 @@
             likes: rawData.likes ?? 0,
             hasLiked: rawData.has_liked || rawData.hasLiked || false,
             caption: rawData.title || '',
-            timeAgo: rawData.time_ago || rawData.timeAgo || 'Just now',
+            timeAgo: formatTimeAgo(rawData.created_at),
           }
         } catch (err) {
           if (err.name !== 'AbortError') {
