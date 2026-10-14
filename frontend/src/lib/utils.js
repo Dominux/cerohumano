@@ -1,6 +1,6 @@
 export { cn } from 'cn'
 
-const BASE_URL = 'http://localhost:18777'
+const BASE_URL = ''
 
 /**
  * Generates an absolute Nginx media URL for a post attachment based on its UUID.
