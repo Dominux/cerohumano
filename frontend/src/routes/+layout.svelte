@@ -38,7 +38,7 @@
 	-->
   <header class="w-full shrink-0 border-b border-gray-100 bg-white z-50">
     <div
-      class="mx-auto max-w-md h-12 flex items-center justify-center px-4 relative"
+      class="mx-auto max-w-xl h-12 flex items-center justify-center px-4 relative"
     >
       <!-- Dynamic Logo centered perfectly inside the mobile bounding shell -->
       <!-- svelte-ignore a11y_invalid_attribute -->
@@ -66,7 +66,7 @@
 	-->
   <footer class="w-full shrink-0 border-t border-gray-100 bg-white z-40">
     <div
-      class="mx-auto max-w-md h-12 pb-safe flex items-center justify-between px-6"
+      class="mx-auto max-w-xl h-12 pb-safe flex items-center justify-between px-6"
     >
       <!-- Home Tab Icon Link -->
       <!-- svelte-ignore a11y_invalid_attribute -->

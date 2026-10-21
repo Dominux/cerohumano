@@ -116,7 +116,7 @@
 </script>
 
 <div
-  class="mx-auto max-w-md bg-white min-h-screen text-black select-none pb-12"
+  class="mx-auto max-w-xl bg-white min-h-screen text-black select-none pb-12"
 >
   <!-- 1. Native Feel Sub-Header Navigation Banner Bar -->
   <header
@@ -155,7 +155,7 @@
           href="/profile/{post.username}"
           class="flex items-center gap-3 hover:opacity-90 transition-opacity"
         >
-          <Avatar.Root class="h-8 w-8 ring-2 ring-pink-500 ring-offset-2">
+          <Avatar.Root class="h-12 w-12 ring-2 ring-pink-500 ring-offset-2">
             <Avatar.Image
               src={post.avatarUrl}
               alt={post.username}
@@ -165,7 +165,7 @@
               >{post.username.slice(0, 2).toUpperCase()}</Avatar.Fallback
             >
           </Avatar.Root>
-          <span class="text-xs font-bold text-zinc-900">{post.username}</span>
+          <span class="text-s font-bold text-zinc-900">{post.username}</span>
         </a>
         <Button variant="ghost" size="icon" class="h-8 w-8 text-zinc-500"
           ><MoreHorizontal class="h-5 w-5" /></Button

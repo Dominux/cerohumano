@@ -184,7 +184,7 @@
   onscroll={handleScrollTrigger}
   class="h-full w-full overflow-y-auto px-1 bg-white select-none no-scrollbar"
 >
-  <div class="mx-auto max-w-md pb-24 pt-2">
+  <div class="mx-auto max-w-xl pb-24 pt-2">
     {#if posts.length === 0 && !isLoading && !errorMsg}
       <div
         class="flex h-[50vh] flex-col items-center justify-center text-zinc-400"
@@ -204,7 +204,7 @@
                     class="flex items-center gap-3 hover:opacity-90 transition-opacity"
                   >
                     <Avatar.Root
-                      class="h-8 w-8 ring-2 ring-pink-500 ring-offset-2"
+                      class="h-12 w-12 ring-2 ring-pink-500 ring-offset-2"
                     >
                       <Avatar.Image
                         src={post.avatarUrl}
@@ -217,8 +217,7 @@
                           .toUpperCase()}</Avatar.Fallback
                       >
                     </Avatar.Root>
-                    <span
-                      class="text-xs font-bold text-zinc-900 hover:underline"
+                    <span class="text-s font-bold text-zinc-900 hover:underline"
                       >{post.username}</span
                     >
                   </a>

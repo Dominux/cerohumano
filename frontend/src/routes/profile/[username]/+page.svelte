@@ -142,7 +142,7 @@
   onscroll={handleProfileScroll}
   class="h-full w-full overflow-y-auto bg-white select-none no-scrollbar"
 >
-  <div class="mx-auto max-w-md bg-white pb-24 min-h-screen text-black">
+  <div class="mx-auto max-w-xl bg-white pb-24 min-h-screen text-black">
     {#if isLoadingProfile}
       <div
         class="flex h-[30vh] flex-col items-center justify-center text-zinc-400 gap-2"
@@ -161,7 +161,7 @@
       <div class="px-5 pt-6 pb-4">
         <div class="flex items-center justify-between gap-6">
           <Avatar.Root
-            class="h-20 w-20 ring-2 ring-zinc-100 ring-offset-2 shrink-0"
+            class="h-30 w-30 ring-2 ring-zinc-100 ring-offset-2 shrink-0"
           >
             <Avatar.Image
               src={getAttachmentUrl(profileData.profile_picture_id)}
