@@ -1,6 +1,6 @@
 <script>
   import './layout.css'
-  import { Heart, Home, Search, PlusSquare, User } from 'lucide-svelte'
+  import { Home, Search, PlusSquare } from 'lucide-svelte'
   import { goto } from '$app/navigation'
   import { page } from '$app/state'
 
@@ -86,9 +86,19 @@
       </a>
 
       <!-- Search Button -->
-      <button class="p-2 text-zinc-400 active:scale-90 transition-transform">
-        <Search class="h-6 w-6" />
-      </button>
+      <a
+        href="/search"
+        class="p-2 active:scale-90 transition-transform {page.url.pathname ===
+        '/search'
+          ? 'text-zinc-900'
+          : 'text-zinc-400'}"
+      >
+        <Search
+          class="h-6 w-6 {page.url.pathname === '/search'
+            ? 'stroke-zinc-900 stroke-[2.5px]'
+            : ''}"
+        />
+      </a>
 
       <!-- Post Creation Button -->
       <button class="p-2 text-zinc-400 active:scale-90 transition-transform">

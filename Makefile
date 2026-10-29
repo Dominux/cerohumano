@@ -3,3 +3,6 @@ up:
 
 down:
 	docker compose down
+
+run_dev_front:
+	cd frontend && pnpm dev
