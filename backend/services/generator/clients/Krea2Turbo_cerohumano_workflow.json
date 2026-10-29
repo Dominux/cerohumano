@@ -11,7 +11,7 @@
   },
   "250:239": {
     "inputs": {
-      "unet_name": "redcraftREDMIXHybridA2A_30Krea2.safetensors",
+      "unet_name": "lustifyNSFWCheckpoint_v10Krea2_fp8.safetensors",
       "weight_dtype": "default"
     },
     "class_type": "UNETLoader",

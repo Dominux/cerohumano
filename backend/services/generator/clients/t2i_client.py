@@ -60,7 +60,7 @@ class T2IClient:
 
             # 2. Poll the lightweight /queue endpoint every n seconds
             while True:
-                await asyncio.sleep(3.0)
+                await asyncio.sleep(1.0)
 
                 queue_res = await client.get(f"{T2I_BASEURL}/queue")
                 queue_res.raise_for_status()
