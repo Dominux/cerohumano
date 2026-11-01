@@ -4,7 +4,7 @@ import logging
 import random
 import sys
 
-from app.repositories import JobRepository, CeroHumanoRepository
+from app.repositories import JobRepository, PostRepository
 from app.models import JobStatus, JobType, JobModel
 from app.common.database import get_db_context
 from clients import LLMClient, T2IClient, ServerClient
@@ -70,16 +70,12 @@ class QueueManager:
                     return  # Queue is empty, loop will sleep and check again
 
                 # creating daily batch
-                cerohumanos_ids = await CeroHumanoRepository(session).list_ids()
-                if len(cerohumanos_ids) < 5:
-                    logger.info('Too less cerohumanos, skipping job creation')
-                    return
-
+                cerohumanos_ids = await PostRepository(session).list_next_author_ids(self.daily_posts_amount)
                 daily_batch = [
                     {
-                        'cerohumano_id': random.choice(cerohumanos_ids)
+                        'cerohumano_id': c_id
                     }
-                    for _ in range(self.daily_posts_amount)
+                    for c_id in cerohumanos_ids
                 ]
                 jobs = await repo.create_batch(daily_batch)
                 job = jobs[0]
