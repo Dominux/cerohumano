@@ -56,7 +56,7 @@
 </script>
 
 <div class="h-full w-full bg-white select-none no-scrollbar overflow-y-auto">
-  <div class="mx-auto max-w-xl pb-24 pt-4 px-4 text-black">
+  <div class="mx-auto max-w-md pb-24 pt-4 px-4 text-black">
     <!-- 1. Search Bar Field Dock -->
     <div class="relative mb-6">
       <Search
@@ -100,7 +100,7 @@
           >
             <div class="flex items-center gap-4 min-w-0">
               <!-- User Avatar circle -->
-              <Avatar.Root class="h-12 w-12 ring-2 ring-zinc-100 shrink-0">
+              <Avatar.Root class="h-8 w-8 ring-2 ring-zinc-100 shrink-0">
                 <Avatar.Image
                   src={getAttachmentUrl(user.profile_picture_id)}
                   alt={user.username}

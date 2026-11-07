@@ -142,7 +142,7 @@
   onscroll={handleProfileScroll}
   class="h-full w-full overflow-y-auto bg-white select-none no-scrollbar"
 >
-  <div class="mx-auto max-w-xl bg-white pb-24 min-h-screen text-black">
+  <div class="mx-auto max-w-md bg-white pb-24 min-h-screen text-black">
     {#if isLoadingProfile}
       <div
         class="flex h-[30vh] flex-col items-center justify-center text-zinc-400 gap-2"
@@ -158,54 +158,64 @@
       </div>
     {:else}
       <!-- Header Profile Info Block (Remains unchanged) -->
-      <div class="px-5 pt-6 pb-4">
-        <div class="flex items-center justify-between gap-6">
+      <div class="px-4 pt-6 pb-4">
+        <!-- Main horizontal split flex tracking grid -->
+        <div class="flex items-start gap-5">
+          <!-- 1. LEFT SIDE: Large, unconstrained profile avatar circle frame layout -->
           <Avatar.Root
-            class="h-30 w-30 ring-2 ring-zinc-100 ring-offset-2 shrink-0"
+            class="h-[130px] w-[130px] shrink-0 border border-zinc-100 shadow-none"
           >
             <Avatar.Image
               src={getAttachmentUrl(profileData.profile_picture_id)}
-              alt={data.username}
+              alt={profileData.username}
               class="object-cover"
             />
-            <Avatar.Fallback class="text-xl font-bold"
-              >{data.username.slice(0, 2).toUpperCase()}</Avatar.Fallback
+            <Avatar.Fallback class="text-xl font-bold bg-zinc-50"
+              >{profileData.username.slice(0, 2).toUpperCase()}</Avatar.Fallback
             >
           </Avatar.Root>
 
-          <div class="flex flex-1 justify-around text-center">
-            <div class="flex flex-col">
-              <span class="text-sm font-bold text-zinc-900"
-                >{profileData.posts_count ?? 0}</span
+          <div class="flex-1 min-w-0 pt-0.5 space-y-2">
+            <!-- Username Header Row containing the ellipsis action button -->
+            <div class="flex items-center gap-1.5">
+              <h2
+                class="text-xl font-medium tracking-tight text-zinc-900 truncate max-w-[160px]"
               >
-              <span class="text-[11px] text-zinc-500 font-medium">posts</span>
+                {profileData.username}
+              </h2>
             </div>
-            <div class="flex flex-col">
-              <span class="text-sm font-bold text-zinc-900"
-                >{(profileData.followers_count ?? 0).toLocaleString()}</span
-              >
-              <span class="text-[11px] text-zinc-500 font-medium"
-                >followers</span
+
+            <!-- Real-name & Pronouns Subtitle Indicator Block -->
+            <div class="text-xs font-medium text-zinc-900">
+              <span
+                >{`${profileData.first_name} ${profileData.last_name}` ||
+                  profileData.username}</span
               >
             </div>
-            <div class="flex flex-col">
-              <span class="text-sm font-bold text-zinc-900"
-                >{(profileData.following_count ?? 0).toLocaleString()}</span
-              >
-              <span class="text-[11px] text-zinc-500 font-medium"
-                >following</span
-              >
+
+            <!-- Compact Stats Row arranged perfectly flat next to text layout boundaries -->
+            <div
+              class="flex items-center gap-4 text-xs font-normal text-zinc-900"
+            >
+              <div>
+                <span class="font-semibold">{profileData.posts_count ?? 0}</span
+                >
+                <span class="text-zinc-800 ml-0.5">posts</span>
+              </div>
+              <div>
+                <span class="font-semibold"
+                  >{(profileData.followers_count ?? 0).toLocaleString()}</span
+                >
+                <span class="text-zinc-800 ml-0.5">followers</span>
+              </div>
+              <div>
+                <span class="font-semibold"
+                  >{(profileData.following_count ?? 0).toLocaleString()}</span
+                >
+                <span class="text-zinc-800 ml-0.5">following</span>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="mt-4 text-xs space-y-0.5">
-          <h1 class="font-bold text-zinc-900">
-            {data.username}
-          </h1>
-          <p class="text-zinc-600 leading-relaxed max-w-sm whitespace-pre-wrap">
-            {profileData.first_name + ' ' + profileData.last_name}
-          </p>
         </div>
       </div>
 
