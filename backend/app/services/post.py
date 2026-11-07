@@ -45,3 +45,6 @@ class PostService(BaseService[PostModel]):
 
     async def get_post_with_attachments(self, post_id: uuid.UUID):
         return await self.repository.get_post_with_attachments(post_id)
+
+    async def get_random_post_with_attachments(self):
+        return await self.repository.get_random_post()

@@ -49,6 +49,20 @@ class PostRepository(BaseRepository[PostModel]):
         result = await self.session.scalars(stmt)
         return result.unique().one()
 
+    async def get_random_post(self):
+        stmt = (
+            sa.select(self.model)
+            .options(
+                sa.orm.joinedload(self.model.attachments),
+                sa.orm.joinedload(self.model.author),
+            )
+            .order_by(sa.func.random())
+            .limit(1)
+        )
+
+        result = await self.session.execute(stmt)
+        return result.unique().scalar_one_or_none()
+
     async def list_next_author_ids(self, amount: int):
         query = '''
             WITH slots AS (

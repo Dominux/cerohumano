@@ -47,6 +47,14 @@ async def list_posts(
 
 
 @router.get(
+    "/random",
+    response_model=PostWithAttachmentsResponse,
+)
+async def get_random_post(db: AsyncSession = Depends(get_db)):
+    return await PostService(db).get_random_post_with_attachments()
+
+
+@router.get(
     "/{post_id}",
     response_model=PostWithAttachmentsResponse,
 )

@@ -1,8 +1,9 @@
 <script>
   import './layout.css'
-  import { Home, Search, PlusSquare } from 'lucide-svelte'
-  import { goto } from '$app/navigation'
+  import { Home, Search, Dices } from 'lucide-svelte'
+  import { goto, invalidateAll } from '$app/navigation'
   import { page } from '$app/state'
+  import { getAbsoluteUrl } from '#lib/utils.js'
 
   /** @type {{ children: any }} */
   let { children } = $props()
@@ -22,6 +23,33 @@
         scrollableContainer.scrollTo({ top: 0, behavior: 'smooth' })
       }
     } else {
+      goto('/')
+    }
+  }
+
+  /**
+   * Hits your random endpoint directly on click and forces a clean SvelteKit state refresh
+   * @param {Event} e
+   */
+  async function triggerRandomDiscovery(e) {
+    e.preventDefault()
+
+    try {
+      // Request a fresh random post object directly from your FastAPI network layer
+      const response = await fetch(
+        getAbsoluteUrl(`/api/posts/random?t=${Date.now()}`),
+      ) // Timestamp breaks browser caching
+      if (response.ok) {
+        const data = await response.json()
+        if (data && data.id) {
+          // 1. Force navigation straight to the newly fetched ID path
+          await goto(`/posts/${data.id}`)
+          // 2. Invalidate all active data loaders to force Svelte to re-fetch the new post parameters instantly
+          await invalidateAll()
+        }
+      }
+    } catch (err) {
+      console.error('Random navigation pipeline exception:', err)
       goto('/')
     }
   }
@@ -101,9 +129,23 @@
       </a>
 
       <!-- Post Creation Button -->
-      <button class="p-2 text-zinc-400 active:scale-90 transition-transform">
-        <PlusSquare class="h-6 w-6" />
-      </button>
+      <!-- svelte-ignore a11y_invalid_attribute -->
+      <a
+        href="/posts/random"
+        onclick={triggerRandomDiscovery}
+        class="p-2 active:scale-90 transition-transform {page.url.pathname.startsWith(
+          '/posts/',
+        ) && !page.url.pathname.includes('profile')
+          ? 'text-zinc-900'
+          : 'text-zinc-400'}"
+      >
+        <Dices
+          class="h-6 w-6 {page.url.pathname.startsWith('/posts/') &&
+          !page.url.pathname.includes('profile')
+            ? 'stroke-zinc-900 stroke-[2.5px]'
+            : ''}"
+        />
+      </a>
     </div>
   </footer>
 </div>

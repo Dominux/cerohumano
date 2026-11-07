@@ -27,13 +27,17 @@
   let errorMsg = $state(null)
   let activeImageIndex = $state(0)
   let lastTap = 0
+  let isTransitioning = $state(false)
 
   $effect(() => {
+    const currentPostId = data.id
+
     const controller = new AbortController()
 
     async function fetchSinglePost() {
       untrack(async () => {
         try {
+          isTransitioning = true
           isLoading = true
           errorMsg = null
 
@@ -61,9 +65,23 @@
             caption: rawData.title || '',
             timeAgo: formatTimeAgo(rawData.created_at),
           }
+
+          activeImageIndex = 0
+
+          // Force Embla Carousel to hard-snap back to the 1st slide instantly ---
+          if (emblaApi) {
+            // scrollTo(index, jump) -> true means jump instantly without sliding animations
+            emblaApi.scrollTo(0, true)
+          }
+
+          // A tiny 50ms timeout ensures the browser DOM updates its image slots first
+          setTimeout(() => {
+            isTransitioning = false
+          }, 50)
         } catch (err) {
           if (err.name !== 'AbortError') {
             errorMsg = err.message || 'Failed to sync with API database.'
+            isTransitioning = false
           }
         } finally {
           isLoading = false
@@ -103,8 +121,13 @@
     lastTap = now
   }
 
+  /** @type {any} */
+  let emblaApi = null // Holds the active reference to Embla's internal engine controls
+
   function initCarouselApi(api) {
     if (!api) return
+    emblaApi = api // Save the instance link globally within the script scope
+
     api.on('select', () => {
       activeImageIndex = api.selectedScrollSnap()
     })
@@ -174,7 +197,12 @@
 
       <!-- Embla Drag Carousel Content Shell Container -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
-      <div class="relative w-full aspect-[3/4]" onclick={handleDoubleClick}>
+      <div
+        class="relative w-full aspect-[3/4] bg-zinc-50 transition-opacity duration-150 ease-out {isTransitioning
+          ? 'opacity-0'
+          : 'opacity-100'}"
+        onclick={handleDoubleClick}
+      >
         <Carousel.Root
           setApi={initCarouselApi}
           opts={{ loop: false, watchDrag: true }}

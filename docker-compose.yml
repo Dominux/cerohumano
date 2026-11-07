@@ -40,25 +40,25 @@ services:
     networks:
       - cerohumano-network
 
-  cerohumano-generator:
-    container_name: cerohumano_generator
-    image: cerohumano-generator
-    build:
-      context: ./backend
-      dockerfile: ./services/generator/Dockerfile
-    tty: true
-    restart: unless-stopped
-    depends_on:
-      - cerohumano-db
-      - cerohumano-llm
-      - cerohumano-server
-    env_file:
-      - .env
-    logging: *formatted-logging
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    networks:
-      - cerohumano-network
+  # cerohumano-generator:
+  #   container_name: cerohumano_generator
+  #   image: cerohumano-generator
+  #   build:
+  #     context: ./backend
+  #     dockerfile: ./services/generator/Dockerfile
+  #   tty: true
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - cerohumano-db
+  #     - cerohumano-llm
+  #     - cerohumano-server
+  #   env_file:
+  #     - .env
+  #   logging: *formatted-logging
+  #   extra_hosts:
+  #     - 'host.docker.internal:host-gateway'
+  #   networks:
+  #     - cerohumano-network
 
   cerohumano-db:
     container_name: cerohumano_db
@@ -79,29 +79,29 @@ services:
     networks:
       - cerohumano-network
 
-  cerohumano-llm:
-    container_name: cerohumano_llm
-    image: cerohumano-llm
-    build:
-      context: ./llm
-      dockerfile: Dockerfile
-    # ports:
-    #   - 11434:11434
-    volumes:
-      - ./llm/models:/app/models
-      - cerohumano-llm-volume:/root/.ollama
-    tty: true
-    restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    # logging: *formatted-logging
-    networks:
-      - cerohumano-network
+  # cerohumano-llm:
+  #   container_name: cerohumano_llm
+  #   image: cerohumano-llm
+  #   build:
+  #     context: ./llm
+  #     dockerfile: Dockerfile
+  #   # ports:
+  #   #   - 11434:11434
+  #   volumes:
+  #     - ./llm/models:/app/models
+  #     - cerohumano-llm-volume:/root/.ollama
+  #   tty: true
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+  #   # logging: *formatted-logging
+  #   networks:
+  #     - cerohumano-network
 
   cerohumano_nginx:
     container_name: cerohumano_nginx_proxy
